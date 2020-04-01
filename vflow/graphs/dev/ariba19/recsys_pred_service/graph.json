@@ -1,0 +1,174 @@
+{
+    "properties": {},
+    "description": "[Ariba19] RecSys Predict Service",
+    "processes": {
+        "collaborativefilteringmodel1": {
+            "component": "com.sap.ariba.recsys_collabfilter1",
+            "metadata": {
+                "label": "Collaborative Filtering Model",
+                "x": 386.99999809265137,
+                "y": 85.49999952316284,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "rating_range": "1,2"
+                }
+            }
+        },
+        "openapiservlow11": {
+            "component": "com.sap.openapi.server",
+            "metadata": {
+                "label": "OpenAPI Servlow",
+                "x": 756.9999961853027,
+                "y": 84.99999952316284,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {
+                    "basePath": "/recsys",
+                    "swaggerSpec": "{\n  \"swagger\": \"2.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Product Recommendations\",\n    \"description\": \"Product Recommendations.\"\n  },\n  \"host\": \"sapdatahub.com\",\n  \"basePath\": \"/recsys\",\n  \"schemes\": [\n    \"http\",\n    \"https\"\n  ],\n  \"consumes\": [\n    \"application/json\"\n  ],\n  \"produces\": [\n    \"application/json\"\n  ],\n  \"paths\": {\n    \"/recs/{uid}\": {\n      \"get\": {\n        \"description\": \"Returns recommendations for given user id\",\n        \"operationId\": \"recs\",\n        \"produces\": [\n          \"application/json\"\n        ],\n        \"parameters\": [\n          {\n            \"name\": \"uid\",\n            \"in\": \"path\",\n            \"description\": \"ID of user\",\n            \"required\": true,\n            \"type\": \"string\"\n          },\n          {\n            \"name\": \"num\",\n            \"in\": \"query\",\n            \"description\": \"Number of recommendations\",\n            \"required\": false,\n            \"type\": \"integer\"\n          }\n        ],\n        \"responses\": {\n          \"200\": {\n            \"description\": \"recommendation response\",\n            \"schema\": {\n              \"$ref\": \"#/definitions/Recommendations\"\n            }\n          },\n          \"default\": {\n            \"description\": \"unexpected error\",\n            \"schema\": {\n              \"$ref\": \"#/definitions/ErrorModel\"\n            }\n          }\n        }\n      }\n    }\n  },\n  \"definitions\": {\n    \"Recommendations\": {\n      \"type\": \"object\",\n      \"required\": [\n        \"uid\",\n        \"items\"\n      ],\n      \"properties\": {\n        \"uid\": {\n          \"type\": \"string\"\n        },\n        \"items\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"object\",\n            \"required\": [\n              \"iid\",\n              \"weight\"\n            ],\n            \"properties\": {\n              \"iid\": {\n                \"type\": \"string\"\n              },\n              \"weight\": {\n                \"type\": \"number\"\n              }\n            }\n          }\n        }\n      }\n    },\n    \"ErrorModel\": {\n      \"type\": \"object\",\n      \"required\": [\n        \"code\",\n        \"message\"\n      ],\n      \"properties\": {\n        \"code\": {\n          \"type\": \"integer\",\n          \"format\": \"int32\"\n        },\n        \"message\": {\n          \"type\": \"string\"\n        }\n      }\n    }\n  }\n}"
+                }
+            },
+            "name": "openapiservlow1"
+        },
+        "blankjsoperator111": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "OpenAPI Controller",
+                "x": 201.99999904632568,
+                "y": 39.99999952316284,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "\nfunction RequestController(req, resp) {\n    \n    switch (req.opid) {\n        case \"recs\":\n            resp.code = 200;\n            var num = parseInt(req.query_param(\"num\"));\n            if(num == undefined) num = 10;\n            var query = JSON.stringify([{\"uid\": req.path_param(\"uid\"), \"num\": num}]);\n            resp.data = query;\n            $.out1(resp.to_message());\n            break;\n        default:\n            resp.code = 503;\n            resp.error = \"Unexpected operation ID\";\n            $.out1(resp.to_message());\n            break;\n    }\n}\n\n\n\n\n// == Internals ========================================================\n\n$.setPortCallback(\"input\",onInput);\n\n/**\n * For each incoming request, prepare the request and response message\n * and forward to RequestControl.\n */\nfunction onInput(ctx, request_message) {\n    request_body = parseBytesIfNecessary(request_message.Body);\n    \n    // prepare response message object\n    var response_message = {};\n    response_message.Attributes = {};\n    response_message.Body = undefined;\n    \n    // copy request attributes to response\n    response_message.Attributes = mergeArray(\n          response_message.Attributes,\n          request_message.Attributes\n    );\n    \n    RequestController(\n        RequestWrapper(request_message, request_body), \n        ResponseWrapper(response_message)\n    );\n}\n\n/**\n * Wraps the access to a request message.\n * Message can still be accessed by the 'message' property.\n */\nfunction RequestWrapper(req_msg, req_body) {\n    var pget = function(p) { return req_msg.Attributes[\"openapi.\" + p] }\n    var wrapper = {\n        message: req_msg,\n        path_param: function(name) { return pget(\"path_params.\" + name) },\n        query_param: function(name) { return pget(\"query_params.\" + name) },\n        body: req_body,\n        method: pget(\"method\"),\n        opid: pget(\"operation_id\"),\n        path_pattern: pget(\"path_pattern\"),\n        host: pget(\"host\"),\n        remote_addr: pget(\"remote_addr\"),\n        request_uri: pget(\"request_uri\")\n    };\n    return wrapper;\n}\n\n/**\n * Wraps the access to a response message.\n * Message can still be accessed by the 'message' property.\n */\nfunction ResponseWrapper(resp_msg) {\n    var wrapper = {\n        message: resp_msg,\n        code: 200,\n        error: undefined,\n        data: undefined,\n        to_message: function() {\n            resp_msg.Attributes[\"openapi.status_code\"] = this.code;\n            if(this.error != undefined) {\n                resp_msg.Attributes[\"message.response.error\"] = this.error;\n            }\n            resp_msg.Body = this.data;\n            return resp_msg;\n        }\n    };\n    return wrapper;\n}\n\nfunction mergeArray(array1,array2) {\n  for(item in array1) {\n    array2[item] = array1[item];\n  }\n  return array2;\n}\n\nfunction parseBytesIfNecessary(data) {\n    // convert the body into string if it is bytes\n    if (isByteArray(data)) {\n        return String.fromCharCode.apply(null, data);\n    }\n    return data\n}\n\nfunction isByteArray(data) {\n    switch (Object.prototype.toString.call(data)) {\n        case \"[object Int8Array]\":\n        case \"[object Uint8Array]\":\n            return true;\n        case \"[object Array]\":\n        case \"[object GoArray]\":\n            return data.length > 0 && typeof data[0] === 'number';\n    }\n    return false;\n}\n"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "out1",
+                        "type": "message"
+                    }
+                ]
+            },
+            "name": "blankjsoperator11"
+        },
+        "blankjsoperator1111": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "OpenAPI Controller",
+                "x": 571.999997138977,
+                "y": 85.49999952316284,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "\nfunction RequestController(req, resp) {\n    \n    switch (req.opid) {\n        case \"recs\":\n            var obj = JSON.parse(req.body)\n            if(obj[\"error\"] == true) {\n                resp.code = 500;\n                resp.data = {\"code\": 1, \"message\": obj[\"message\"]}\n            } else {\n                resp.code = 200;\n                resp.data = obj[\"result\"][0]\n            }\n            $.out1(resp.to_message());\n            break;\n        default:\n            resp.code = 503;\n            resp.error = \"Unexpected operation ID\";\n            $.out1(resp.to_message());\n            break;\n    }\n}\n\n\n\n\n// == Internals ========================================================\n\n$.setPortCallback(\"input\",onInput);\n\n/**\n * For each incoming request, prepare the request and response message\n * and forward to RequestControl.\n */\nfunction onInput(ctx, request_message) {\n    request_body = parseBytesIfNecessary(request_message.Body);\n    \n    // prepare response message object\n    var response_message = {};\n    response_message.Attributes = {};\n    response_message.Body = undefined;\n    \n    // copy request attributes to response\n    response_message.Attributes = mergeArray(\n          response_message.Attributes,\n          request_message.Attributes\n    );\n    \n    RequestController(\n        RequestWrapper(request_message, request_body), \n        ResponseWrapper(response_message)\n    );\n}\n\n/**\n * Wraps the access to a request message.\n * Message can still be accessed by the 'message' property.\n */\nfunction RequestWrapper(req_msg, req_body) {\n    var pget = function(p) { return req_msg.Attributes[\"openapi.\" + p] }\n    var wrapper = {\n        message: req_msg,\n        path_param: function(name) { return pget(\"path_params.\" + name) },\n        query_param: function(name) { return pget(\"query_params.\" + name) },\n        body: req_body,\n        method: pget(\"method\"),\n        opid: pget(\"operation_id\"),\n        path_pattern: pget(\"path_pattern\"),\n        host: pget(\"host\"),\n        remote_addr: pget(\"remote_addr\"),\n        request_uri: pget(\"request_uri\")\n    };\n    return wrapper;\n}\n\n/**\n * Wraps the access to a response message.\n * Message can still be accessed by the 'message' property.\n */\nfunction ResponseWrapper(resp_msg) {\n    var wrapper = {\n        message: resp_msg,\n        code: 200,\n        error: undefined,\n        data: undefined,\n        to_message: function() {\n            resp_msg.Attributes[\"openapi.status_code\"] = this.code;\n            if(this.error != undefined) {\n                resp_msg.Attributes[\"message.response.error\"] = this.error;\n            }\n            resp_msg.Body = this.data;\n            return resp_msg;\n        }\n    };\n    return wrapper;\n}\n\nfunction mergeArray(array1,array2) {\n  for(item in array1) {\n    array2[item] = array1[item];\n  }\n  return array2;\n}\n\nfunction parseBytesIfNecessary(data) {\n    // convert the body into string if it is bytes\n    if (isByteArray(data)) {\n        return String.fromCharCode.apply(null, data);\n    }\n    return data\n}\n\nfunction isByteArray(data) {\n    switch (Object.prototype.toString.call(data)) {\n        case \"[object Int8Array]\":\n        case \"[object Uint8Array]\":\n            return true;\n        case \"[object Array]\":\n        case \"[object GoArray]\":\n            return data.length > 0 && typeof data[0] === 'number';\n    }\n    return false;\n}\n"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "out1",
+                        "type": "message"
+                    }
+                ]
+            },
+            "name": "blankjsoperator111"
+        },
+        "modelconsumer1": {
+            "component": "com.sap.ml.model.consumer",
+            "metadata": {
+                "label": "Model Consumer",
+                "x": 215,
+                "y": 198,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "blobName": "com.sap.ariba.recsys.cb1",
+                    "blobVersion": "1"
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "510.99999809265137,134.49999952316284 538.9999976158142,134.49999952316284 538.9999976158142,125.49999952316284 566.999997138977,125.49999952316284"
+            },
+            "src": {
+                "port": "outpred",
+                "process": "collaborativefilteringmodel1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "blankjsoperator1111"
+            }
+        },
+        {
+            "metadata": {
+                "points": "695.999997138977,125.49999952316284 723.9999966621399,125.49999952316284 723.9999966621399,124.99999952316284 751.9999961853027,124.99999952316284"
+            },
+            "src": {
+                "port": "out1",
+                "process": "blankjsoperator1111"
+            },
+            "tgt": {
+                "port": "ret",
+                "process": "openapiservlow11"
+            }
+        },
+        {
+            "metadata": {
+                "points": "880.9999961853027,124.99999952316284 908.9999957084656,124.99999952316284 908.9999957084656,57 723.9999966621399,57 723.9999966621399,56.5 353.9999985694885,56.5 353.9999985694885,12 168.99999952316284,12 168.99999952316284,79.99999952316284 196.99999904632568,79.99999952316284"
+            },
+            "src": {
+                "port": "out",
+                "process": "openapiservlow11"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "blankjsoperator111"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,79.99999952316284 353.9999985694885,79.99999952316284 353.9999985694885,125.49999952316284 381.99999809265137,125.49999952316284"
+            },
+            "src": {
+                "port": "out1",
+                "process": "blankjsoperator111"
+            },
+            "tgt": {
+                "port": "inpredict",
+                "process": "collaborativefilteringmodel1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "339,238 360.5,238 360.5,143.5 381.99999809265137,143.49999952316284"
+            },
+            "src": {
+                "port": "outBlob",
+                "process": "modelconsumer1"
+            },
+            "tgt": {
+                "port": "inmodel",
+                "process": "collaborativefilteringmodel1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

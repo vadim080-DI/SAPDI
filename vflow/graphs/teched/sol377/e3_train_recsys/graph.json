@@ -1,0 +1,207 @@
+{
+    "properties": {},
+    "description": "[SOL377] Train RecSys",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/export/",
+                    "pollPeriodInMs": "5000",
+                    "pattern": "json",
+                    "onlyReadOnChange": true
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 740.999997138977,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "collaborativefilteringmodel1": {
+            "component": "com.sap.ariba.recsys_collabfilter1",
+            "metadata": {
+                "label": "Collaborative Filtering Model",
+                "x": 555.9999980926514,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "rating_range": "1,2"
+                }
+            }
+        },
+        "modelproducer1": {
+            "component": "com.sap.ml.model.producer",
+            "metadata": {
+                "label": "Model Producer",
+                "x": 925.9999961853027,
+                "y": 12,
+                "height": 100,
+                "width": 120,
+                "config": {
+                    "blobName": "com.sap.ariba.recsys.cb1",
+                    "blobVersion": "1"
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1263.9999961853027,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "messagetransform1": {
+            "component": "com.sap.datatools.messagetransform",
+            "metadata": {
+                "label": "Message Transform",
+                "x": 201.99999904632568,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "\ndef on_input(msg):\n    \"\"\"\n    Simple operator to transform a message. Operator can be used to:\n    1) change/add/remove the message attributes\n    2) change the message body\n    \"\"\"\n    body = msg.body\n    attr = msg.attributes\n    \n    dotrain = False\n    if msg.attributes[\"storage.endOfFile\"] and msg.attributes[\"storage.endOfSequence\"]:\n        dotrain = True\n    \n    attr.update({\"recsys.dotrain\": dotrain})\n    api.send(\"output\", api.Message(body, attr))\n\napi.set_port_callback(\"input\", on_input)\n"
+                }
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 370.9999990463257,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap3": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 1094.9999961853027,
+                "y": 22,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "679.9999980926514,53 707.9999976158142,53 707.9999976158142,62 735.999997138977,62"
+            },
+            "src": {
+                "port": "outmodel",
+                "process": "collaborativefilteringmodel1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "864.999997138977,62 892.9999966621399,62 892.9999966621399,98 920.9999961853027,98"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "inBlobBinary",
+                "process": "modelproducer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,71 168.99999952316284,71 168.99999952316284,62 196.99999904632568,62"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagetransform1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,62 365.9999990463257,62"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagetransform1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "494.9999990463257,62 522.9999985694885,62 522.9999985694885,44 550.9999980926514,44"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "intrain",
+                "process": "collaborativefilteringmodel1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1049.9999961853027,62 1089.9999961853027,62"
+            },
+            "src": {
+                "port": "success",
+                "process": "modelproducer1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1218.9999961853027,62 1258.9999961853027,62"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap3"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

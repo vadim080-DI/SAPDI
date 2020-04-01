@@ -1,0 +1,926 @@
+{
+    "properties": {},
+    "iconsrc": "",
+    "description": "Ôriginal Pipeline Fieldglass to Vora (Time Sheets)",
+    "processes": {
+        "formatconverter1": {
+            "component": "com.sap.util.formatConverter",
+            "metadata": {
+                "label": "Format Converter",
+                "x": 907.9999961853027,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "csvHeaderIncluded": false,
+                    "fields": "buyer_name,buyer_code,supplier_name,supplier_code,account_name,account_code,remit_to_address_code,job_posting_owner,work_order_id,worker_id,job_seeker_id,worker_last_name,worker_first_name,site_code,site_name,business_unit_code,business_unit_name,final_approver_first_name,final_approver_last_name,final_approver_employee_id,final_approver_email,time_sheet_id,time_sheet_status,time_sheet_start_date,time_sheet_end_date,time_sheet_submit_date_time,time_sheet_approved_date,time_entry_date,cost_center_code,cost_center_name,task_code,task_name,general_ledger_account_code,billable_per_diem,billable_hours,non_billable_hours,total_hours,billable_amount,currency,rate_category_uom,bill_rate_buyer,bill_rate_supplier,pay_rate"
+                }
+            }
+        },
+        "tomessageconverter1": {
+            "component": "com.sap.util.toMessageConverter",
+            "metadata": {
+                "label": "ToMessage Converter",
+                "x": 1092.9999952316284,
+                "y": 115,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "datamask1": {
+            "component": "com.sap.dh.dq.dataMask",
+            "metadata": {
+                "label": "Data Mask",
+                "x": 1191.9999952316284,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "extensible": false,
+                "config": {
+                    "columns": [
+                        {
+                            "ID": "final_approver_email",
+                            "operation": "MASK",
+                            "starting_position": "START",
+                            "unmasked_length": 2,
+                            "masking_character": "*",
+                            "maintain_formatting": true,
+                            "pattern_variance_definition": [],
+                            "auto_range_scale": "NOT_IN_USE",
+                            "auto_range_output_format": "MONTH_DAY_YEAR",
+                            "auto_range_output_year_format": "FULL_YEAR",
+                            "auto_range_output_month_format": "NUMERIC",
+                            "auto_range_output_date_delimeter": "SLASH",
+                            "auto_range_output_numeric_format": "ARABIC_NUMBERS",
+                            "auto_range_output_enable_zero_pad": false,
+                            "auto_range_output_language": "ENGLISH",
+                            "date_generalization_range_definition": [],
+                            "numeric_variance_type": "PERCENTAGE",
+                            "date_variance_type": "RANGE",
+                            "numeric_generalization_range_definition": []
+                        },
+                        {
+                            "ID": "final_approver_first_name",
+                            "operation": "MASK",
+                            "starting_position": "START",
+                            "unmasked_length": 2,
+                            "masking_character": "*",
+                            "maintain_formatting": true,
+                            "pattern_variance_definition": [],
+                            "auto_range_scale": "NOT_IN_USE",
+                            "auto_range_output_format": "MONTH_DAY_YEAR",
+                            "auto_range_output_year_format": "FULL_YEAR",
+                            "auto_range_output_month_format": "NUMERIC",
+                            "auto_range_output_date_delimeter": "SLASH",
+                            "auto_range_output_numeric_format": "ARABIC_NUMBERS",
+                            "auto_range_output_enable_zero_pad": false,
+                            "auto_range_output_language": "ENGLISH",
+                            "date_generalization_range_definition": [],
+                            "numeric_variance_type": "PERCENTAGE",
+                            "date_variance_type": "RANGE",
+                            "numeric_generalization_range_definition": []
+                        },
+                        {
+                            "ID": "final_approver_last_name",
+                            "operation": "MASK",
+                            "starting_position": "START",
+                            "unmasked_length": 2,
+                            "masking_character": "*",
+                            "maintain_formatting": true,
+                            "pattern_variance_definition": [],
+                            "auto_range_scale": "NOT_IN_USE",
+                            "auto_range_output_format": "MONTH_DAY_YEAR",
+                            "auto_range_output_year_format": "FULL_YEAR",
+                            "auto_range_output_month_format": "NUMERIC",
+                            "auto_range_output_date_delimeter": "SLASH",
+                            "auto_range_output_numeric_format": "ARABIC_NUMBERS",
+                            "auto_range_output_enable_zero_pad": false,
+                            "auto_range_output_language": "ENGLISH",
+                            "date_generalization_range_definition": [],
+                            "numeric_variance_type": "PERCENTAGE",
+                            "date_variance_type": "RANGE",
+                            "numeric_generalization_range_definition": []
+                        },
+                        {
+                            "ID": "job_posting_owner",
+                            "operation": "MASK",
+                            "starting_position": "START",
+                            "unmasked_length": 2,
+                            "masking_character": "*",
+                            "maintain_formatting": true,
+                            "pattern_variance_definition": [],
+                            "auto_range_scale": "NOT_IN_USE",
+                            "auto_range_output_format": "MONTH_DAY_YEAR",
+                            "auto_range_output_year_format": "FULL_YEAR",
+                            "auto_range_output_month_format": "NUMERIC",
+                            "auto_range_output_date_delimeter": "SLASH",
+                            "auto_range_output_numeric_format": "ARABIC_NUMBERS",
+                            "auto_range_output_enable_zero_pad": false,
+                            "auto_range_output_language": "ENGLISH",
+                            "date_generalization_range_definition": [],
+                            "numeric_variance_type": "PERCENTAGE",
+                            "date_variance_type": "RANGE",
+                            "numeric_generalization_range_definition": []
+                        },
+                        {
+                            "ID": "worker_first_name",
+                            "operation": "MASK",
+                            "starting_position": "START",
+                            "unmasked_length": 2,
+                            "masking_character": "*",
+                            "maintain_formatting": true,
+                            "pattern_variance_definition": [],
+                            "auto_range_scale": "NOT_IN_USE",
+                            "auto_range_output_format": "MONTH_DAY_YEAR",
+                            "auto_range_output_year_format": "FULL_YEAR",
+                            "auto_range_output_month_format": "NUMERIC",
+                            "auto_range_output_date_delimeter": "SLASH",
+                            "auto_range_output_numeric_format": "ARABIC_NUMBERS",
+                            "auto_range_output_enable_zero_pad": false,
+                            "auto_range_output_language": "ENGLISH",
+                            "date_generalization_range_definition": [],
+                            "numeric_variance_type": "PERCENTAGE",
+                            "date_variance_type": "RANGE",
+                            "numeric_generalization_range_definition": []
+                        },
+                        {
+                            "ID": "worker_last_name",
+                            "operation": "MASK",
+                            "starting_position": "START",
+                            "unmasked_length": 2,
+                            "masking_character": "*",
+                            "maintain_formatting": true,
+                            "pattern_variance_definition": [],
+                            "auto_range_scale": "NOT_IN_USE",
+                            "auto_range_output_format": "MONTH_DAY_YEAR",
+                            "auto_range_output_year_format": "FULL_YEAR",
+                            "auto_range_output_month_format": "NUMERIC",
+                            "auto_range_output_date_delimeter": "SLASH",
+                            "auto_range_output_numeric_format": "ARABIC_NUMBERS",
+                            "auto_range_output_enable_zero_pad": false,
+                            "auto_range_output_language": "ENGLISH",
+                            "date_generalization_range_definition": [],
+                            "numeric_variance_type": "PERCENTAGE",
+                            "date_variance_type": "RANGE",
+                            "numeric_generalization_range_definition": []
+                        }
+                    ]
+                }
+            }
+        },
+        "voraavroingestor1": {
+            "component": "com.sap.vora.avroingestor",
+            "metadata": {
+                "label": "Vora Avro Ingestor",
+                "x": 1529.9999952316284,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "format": "json",
+                    "connectionType": "connection",
+                    "connection": {
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "VORA",
+                        "connectionProperties": {}
+                    },
+                    "defaultAvroSchema": "{   \"name\": \"FG_WORKER_TIME_SHEETS\",   \"type\": \"record\",   \"fields\": [     {       \"name\": \"buyer_name\",       \"type\": \"string\"     },     {       \"name\": \"buyer_code\",       \"type\": \"string\"     },     {       \"name\": \"supplier_name\",       \"type\": \"string\"     },     {       \"name\": \"supplier_code\",       \"type\": \"string\"     },     {       \"name\": \"account_name\",       \"type\": \"string\"     },     {       \"name\": \"account_code\",       \"type\": \"string\"     },     {       \"name\": \"remit_to_address_code\",       \"type\": \"string\"     },     {       \"name\": \"job_posting_owner\",       \"type\": \"string\"     },     {       \"name\": \"work_order_id\",       \"type\": \"string\"     },     {       \"name\": \"worker_id\",       \"type\": \"string\"     },     {       \"name\": \"job_seeker_id\",       \"type\": \"string\"     },     {       \"name\": \"worker_last_name\",       \"type\": \"string\"     },     {       \"name\": \"worker_first_name\",       \"type\": \"string\"     },     {       \"name\": \"site_code\",       \"type\": \"string\"     },     {       \"name\": \"site_name\",       \"type\": \"string\"     },     {       \"name\": \"business_unit_code\",       \"type\": \"string\"     },     {       \"name\": \"business_unit_name\",       \"type\": \"string\"     },     {       \"name\": \"final_approver_first_name\",       \"type\": [         \"null\",         \"string\"       ]     },     {       \"name\": \"final_approver_last_name\",       \"type\": [         \"null\",         \"string\"       ]     },     {       \"name\": \"final_approver_employee_id\",       \"type\": [         \"null\",         \"string\"       ]     },     {       \"name\": \"final_approver_email\",       \"type\": [         \"null\",         \"string\"       ]     },     {       \"name\": \"time_sheet_id\",       \"type\": \"string\"     },     {       \"name\": \"time_sheet_status\",       \"type\": \"string\"     },     {       \"name\": \"time_sheet_start_date\",       \"type\": \"string\"     },     {       \"name\": \"time_sheet_end_date\",       \"type\": \"string\"     },     {       \"name\": \"time_sheet_submit_date_time\",       \"type\": \"string\"     },     {       \"name\": \"time_sheet_approved_date\",       \"type\": \"string\"     },     {       \"name\": \"time_entry_date\",       \"type\": \"string\"     },     {       \"name\": \"cost_center_code\",       \"type\": \"string\"     },     {       \"name\": \"cost_center_name\",       \"type\": \"string\"     },     {       \"name\": \"task_code\",       \"type\": \"string\"     },     {       \"name\": \"task_name\",       \"type\": \"string\"     },     {       \"name\": \"general_ledger_account_code\",       \"type\": \"string\"     },     {       \"name\": \"billable_per_diem\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"billable_hours\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"non_billable_hours\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"total_hours\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"billable_amount\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"currency\",       \"type\": \"string\"     },     {       \"name\": \"rate_category_uom\",       \"type\": \"string\"     },     {       \"name\": \"bill_rate_buyer\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"bill_rate_supplier\",       \"type\": [         \"double\",         \"null\"       ]     },     {       \"name\": \"pay_rate\",       \"type\": [         \"double\",         \"null\"       ]     }   ] }",
+                    "varLimit": 255,
+                    "csvHeaderIncluded": true,
+                    "ingestionMode": "UPSERT",
+                    "primaryKeyRegex": "time_sheet_id|time_entry_date"
+                }
+            }
+        },
+        "jsmessageoperator1": {
+            "component": "com.sap.system.jsmengine",
+            "metadata": {
+                "label": "Prepare",
+                "x": 1360.9999952316284,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var numPackages = 0;\n\n$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var msg = {};\n\n    msg.Body = s.Body;\n\n    msg.Attributes = {};\n    msg.Attributes[\"message.commit.token\"] = numPackages; \n    msg.Attributes[\"package\"] = numPackages;\n\n    $.output(msg);\n    \n    numPackages++;\n}\n"
+                }
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 1698.9999952316284,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "clouddataintegrationconsumer2": {
+            "component": "com.sap.dh.cloud_data_integration",
+            "metadata": {
+                "label": "Cloud Data Integration Consumer",
+                "x": 29,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "source": {
+                        "remoteObjectReference": {
+                            "connection": {
+                                "id": "FIELDGLASS",
+                                "type": "CLOUD_DATA_INTEGRATION"
+                            },
+                            "name": "/fieldglass.insite/worker/time_sheets",
+                            "remoteObjectType": "TABLE",
+                            "qualifiedName": "/fieldglass.insite/worker/time_sheets",
+                            "nativeQualifiedName": "/fieldglass.insite/worker/time_sheets"
+                        },
+                        "schema": {
+                            "tableBasedRepresentation": {
+                                "attributes": [
+                                    {
+                                        "name": "buyer_name",
+                                        "originalName": "buyer_name",
+                                        "qualifiedName": "buyer_name",
+                                        "datatype": "STRING",
+                                        "length": 200,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "buyer_code",
+                                        "originalName": "buyer_code",
+                                        "qualifiedName": "buyer_code",
+                                        "datatype": "STRING",
+                                        "length": 4,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "supplier_name",
+                                        "originalName": "supplier_name",
+                                        "qualifiedName": "supplier_name",
+                                        "datatype": "STRING",
+                                        "length": 200,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "supplier_code",
+                                        "originalName": "supplier_code",
+                                        "qualifiedName": "supplier_code",
+                                        "datatype": "STRING",
+                                        "length": 4,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "account_name",
+                                        "originalName": "account_name",
+                                        "qualifiedName": "account_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "account_code",
+                                        "originalName": "account_code",
+                                        "qualifiedName": "account_code",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "remit_to_address_code",
+                                        "originalName": "remit_to_address_code",
+                                        "qualifiedName": "remit_to_address_code",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "job_posting_owner",
+                                        "originalName": "job_posting_owner",
+                                        "qualifiedName": "job_posting_owner",
+                                        "datatype": "STRING",
+                                        "length": 201,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "work_order_id",
+                                        "originalName": "work_order_id",
+                                        "qualifiedName": "work_order_id",
+                                        "datatype": "STRING",
+                                        "length": 14,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "worker_id",
+                                        "originalName": "worker_id",
+                                        "qualifiedName": "worker_id",
+                                        "datatype": "STRING",
+                                        "length": 14,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "job_seeker_id",
+                                        "originalName": "job_seeker_id",
+                                        "qualifiedName": "job_seeker_id",
+                                        "datatype": "STRING",
+                                        "length": 14,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "worker_last_name",
+                                        "originalName": "worker_last_name",
+                                        "qualifiedName": "worker_last_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "worker_first_name",
+                                        "originalName": "worker_first_name",
+                                        "qualifiedName": "worker_first_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "site_code",
+                                        "originalName": "site_code",
+                                        "qualifiedName": "site_code",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "site_name",
+                                        "originalName": "site_name",
+                                        "qualifiedName": "site_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "business_unit_code",
+                                        "originalName": "business_unit_code",
+                                        "qualifiedName": "business_unit_code",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "business_unit_name",
+                                        "originalName": "business_unit_name",
+                                        "qualifiedName": "business_unit_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "final_approver_first_name",
+                                        "originalName": "final_approver_first_name",
+                                        "qualifiedName": "final_approver_first_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "final_approver_last_name",
+                                        "originalName": "final_approver_last_name",
+                                        "qualifiedName": "final_approver_last_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "final_approver_employee_id",
+                                        "originalName": "final_approver_employee_id",
+                                        "qualifiedName": "final_approver_employee_id",
+                                        "datatype": "STRING",
+                                        "length": 50,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "final_approver_email",
+                                        "originalName": "final_approver_email",
+                                        "qualifiedName": "final_approver_email",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_sheet_id",
+                                        "originalName": "time_sheet_id",
+                                        "qualifiedName": "time_sheet_id",
+                                        "datatype": "STRING",
+                                        "length": 14,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_sheet_status",
+                                        "originalName": "time_sheet_status",
+                                        "qualifiedName": "time_sheet_status",
+                                        "datatype": "STRING",
+                                        "length": 2000,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_sheet_start_date",
+                                        "originalName": "time_sheet_start_date",
+                                        "qualifiedName": "time_sheet_start_date",
+                                        "datatype": "STRING",
+                                        "length": 10,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_sheet_end_date",
+                                        "originalName": "time_sheet_end_date",
+                                        "qualifiedName": "time_sheet_end_date",
+                                        "datatype": "STRING",
+                                        "length": 10,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_sheet_submit_date_time",
+                                        "originalName": "time_sheet_submit_date_time",
+                                        "qualifiedName": "time_sheet_submit_date_time",
+                                        "datatype": "STRING",
+                                        "length": 17,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_sheet_approved_date",
+                                        "originalName": "time_sheet_approved_date",
+                                        "qualifiedName": "time_sheet_approved_date",
+                                        "datatype": "STRING",
+                                        "length": 16,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "time_entry_date",
+                                        "originalName": "time_entry_date",
+                                        "qualifiedName": "time_entry_date",
+                                        "datatype": "STRING",
+                                        "length": 10,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "cost_center_code",
+                                        "originalName": "cost_center_code",
+                                        "qualifiedName": "cost_center_code",
+                                        "datatype": "STRING",
+                                        "length": 200,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "cost_center_name",
+                                        "originalName": "cost_center_name",
+                                        "qualifiedName": "cost_center_name",
+                                        "datatype": "STRING",
+                                        "length": 200,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "task_code",
+                                        "originalName": "task_code",
+                                        "qualifiedName": "task_code",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "task_name",
+                                        "originalName": "task_name",
+                                        "qualifiedName": "task_name",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "general_ledger_account_code",
+                                        "originalName": "general_ledger_account_code",
+                                        "qualifiedName": "general_ledger_account_code",
+                                        "datatype": "STRING",
+                                        "length": 100,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "billable_per_diem",
+                                        "originalName": "billable_per_diem",
+                                        "qualifiedName": "billable_per_diem",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "billable_hours",
+                                        "originalName": "billable_hours",
+                                        "qualifiedName": "billable_hours",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "non_billable_hours",
+                                        "originalName": "non_billable_hours",
+                                        "qualifiedName": "non_billable_hours",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "total_hours",
+                                        "originalName": "total_hours",
+                                        "qualifiedName": "total_hours",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "billable_amount",
+                                        "originalName": "billable_amount",
+                                        "qualifiedName": "billable_amount",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "currency",
+                                        "originalName": "currency",
+                                        "qualifiedName": "currency",
+                                        "datatype": "STRING",
+                                        "length": 3,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "rate_category_uom",
+                                        "originalName": "rate_category_uom",
+                                        "qualifiedName": "rate_category_uom",
+                                        "datatype": "STRING",
+                                        "length": 122,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "bill_rate_buyer",
+                                        "originalName": "bill_rate_buyer",
+                                        "qualifiedName": "bill_rate_buyer",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "bill_rate_supplier",
+                                        "originalName": "bill_rate_supplier",
+                                        "qualifiedName": "bill_rate_supplier",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    },
+                                    {
+                                        "name": "pay_rate",
+                                        "originalName": "pay_rate",
+                                        "qualifiedName": "pay_rate",
+                                        "datatype": "STRING",
+                                        "length": 30,
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "pageSize": 250
+                }
+            }
+        },
+        "flowagentcsvproducer1": {
+            "component": "com.sap.dh.ds.csv.producer",
+            "metadata": {
+                "label": "Flowagent CSV Producer",
+                "x": 398.99999809265137,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "batchSize": 250,
+                    "additionalProperties_csv": {
+                        "columnDelimiter": ",",
+                        "csvHeaderIncluded": false,
+                        "escapeCharacter": "\"",
+                        "rowDelimiter": "Windows-NewLine",
+                        "textDelimiter": "\"",
+                        "textDelimiterStyle": "Minimal"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 583.999997138977,
+                "y": 40,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {
+                    "maxSize": 4096
+                }
+            }
+        },
+        "terminal1": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Error API Fetch",
+                "x": 213.99999904632568,
+                "y": 160,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "toblobconverter1": {
+            "component": "com.sap.util.toBlobConverter",
+            "metadata": {
+                "label": "ToBlob Converter",
+                "x": 768.9999961853027,
+                "y": 115,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "blankjsoperator1": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Error CSV Produce",
+                "x": 583.999997138977,
+                "y": 160,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"error\",onError);\n\nfunction onError(ctx,s) {\n    $.fail(s);\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "error",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "wiretap3": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 213.99999904632568,
+                "y": 40,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {
+                    "maxSize": 40960
+                }
+            }
+        }
+    },
+    "groups": [
+        {
+            "name": "group1",
+            "nodes": [
+                "formatconverter1",
+                "tomessageconverter1",
+                "datamask1",
+                "voraavroingestor1",
+                "jsmessageoperator1",
+                "wiretap2"
+            ],
+            "metadata": {
+                "description": "Worker Time Sheets - Mask & Ingest"
+            }
+        },
+        {
+            "name": "group2",
+            "nodes": [
+                "clouddataintegrationconsumer2",
+                "flowagentcsvproducer1",
+                "wiretap1",
+                "terminal1",
+                "toblobconverter1",
+                "blankjsoperator1",
+                "wiretap3"
+            ],
+            "metadata": {
+                "description": "Worker Time Sheets - Fetch"
+            }
+        }
+    ],
+    "connections": [
+        {
+            "metadata": {
+                "points": "153,149 180.99999952316284,149 180.99999952316284,200 208.99999904632568,200"
+            },
+            "src": {
+                "port": "outError",
+                "process": "clouddataintegrationconsumer2"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "522.9999980926514,131 550.9999976158142,131 550.9999976158142,80 578.999997138977,80"
+            },
+            "src": {
+                "port": "outContent",
+                "process": "flowagentcsvproducer1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "707.999997138977,80 735.9999966621399,80 735.9999966621399,140 763.9999961853027,140"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "toblobconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "822.9999961853027,140 902.9999961853027,140"
+            },
+            "src": {
+                "port": "outbytearray",
+                "process": "toblobconverter1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "formatconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1031.9999961853027,140 1059.9999957084656,140 1059.9999957084656,131 1087.9999952316284,131"
+            },
+            "src": {
+                "port": "output",
+                "process": "formatconverter1"
+            },
+            "tgt": {
+                "port": "inbody",
+                "process": "tomessageconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1146.9999952316284,140 1186.9999952316284,140"
+            },
+            "src": {
+                "port": "out",
+                "process": "tomessageconverter1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "datamask1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1315.9999952316284,140 1355.9999952316284,140"
+            },
+            "src": {
+                "port": "output",
+                "process": "datamask1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "jsmessageoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1484.9999952316284,140 1524.9999952316284,140"
+            },
+            "src": {
+                "port": "output",
+                "process": "jsmessageoperator1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "voraavroingestor1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1653.9999952316284,140 1693.9999952316284,140"
+            },
+            "src": {
+                "port": "out",
+                "process": "voraavroingestor1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "522.9999980926514,149 550.9999976158142,149 550.9999976158142,200 578.999997138977,200"
+            },
+            "src": {
+                "port": "outError",
+                "process": "flowagentcsvproducer1"
+            },
+            "tgt": {
+                "port": "error",
+                "process": "blankjsoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "153,131 180.99999952316284,131 180.99999952316284,80 208.99999904632568,80"
+            },
+            "src": {
+                "port": "outConfig",
+                "process": "clouddataintegrationconsumer2"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "337.9999990463257,80 365.9999985694885,80 365.9999985694885,140 393.99999809265137,140"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap3"
+            },
+            "tgt": {
+                "port": "inConfig",
+                "process": "flowagentcsvproducer1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

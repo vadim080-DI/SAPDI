@@ -1,0 +1,126 @@
+{
+    "properties": {},
+    "description": "3. Load and Send Results",
+    "processes": {
+        "wixclient1": {
+            "component": "teched.dat649.wix_client",
+            "metadata": {
+                "label": "Completed",
+                "x": 370.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "group_id": "${GroupID}",
+                    "state": "Completed"
+                }
+            }
+        },
+        "terminal1": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Terminal",
+                "x": 539.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 33,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "/teched/dat649/${GroupID}/rules.txt",
+                    "service": "hdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    }
+                }
+            }
+        },
+        "python3operator1": {
+            "component": "com.sap.system.python3Operator",
+            "metadata": {
+                "label": "MD5 Checksum",
+                "x": 207,
+                "y": -99,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import hashlib\n\ndef onFile(file):\n    fileContent = file.body\n    m = hashlib.md5()\n    m.update(fileContent)\n    checksum = m.hexdigest()\n    api.send(\"md5Checksum\", checksum)\n    \napi.set_port_callback(\"file\", onFile)"
+                },
+                "additionalinports": [
+                    {
+                        "name": "file",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "md5Checksum",
+                        "type": "string"
+                    }
+                ]
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "494.9999990463257,52 534.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "wixclient1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "157,61 179.5,61 179.5,-59 202,-59"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "file",
+                "process": "python3operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "331,-59 348.5,-59 348.5,52 365.9999990463257,52"
+            },
+            "src": {
+                "port": "md5Checksum",
+                "process": "python3operator1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "wixclient1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

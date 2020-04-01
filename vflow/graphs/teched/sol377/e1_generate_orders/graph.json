@@ -1,0 +1,240 @@
+{
+    "properties": {},
+    "description": "[SOL377] Generate Orders",
+    "processes": {
+        "python3operator1": {
+            "component": "com.sap.system.python3Operator",
+            "metadata": {
+                "label": "Generate Orders",
+                "x": 209.99999904632568,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import time\nimport datetime\nimport re\nimport random\n\nn = 1000\nm = 5\norders = None\n\ndef on_date(msg):\n    wait_for_orders_ready()\n    new_date = msg.body\n    \n    for i in range(m):\n        last = True if i == m-1 else False\n        attr = msg.attributes.copy()\n        attr.update({\"ordergen.last\": last, \"orderdate\": new_date})\n        neworders = random.choices(orders, k=n)\n        api.send(\"output\", api.Message(\"\\n\".join(neworders), attr))\n    \ndef wait_for_orders_ready():\n    while orders == None:\n        time.sleep(0.5)\n    \ndef on_orders(msg):\n    global orders\n    orders = msg.body.decode(\"utf-8\", \"ignore\").split(\"\\n\")\n\napi.set_port_callback(\"newdate\", on_date)\napi.set_port_callback(\"orders\", on_orders)\n\n"
+                },
+                "additionalinports": [
+                    {
+                        "name": "newdate",
+                        "type": "message"
+                    },
+                    {
+                        "name": "orders",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 252,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/orders.csv"
+                }
+            }
+        },
+        "readfile2": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": -151,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/inbox/",
+                    "onlyReadOnChange": true,
+                    "recursive": true,
+                    "batchRead": true,
+                    "service": "FILE",
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 386.99999809265137,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/inbox/\\${orderdate}/part-<counter>.csv",
+                    "mode": "overwrite",
+                    "service": "FILE",
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "messagefilter1": {
+            "component": "com.sap.datatools.message_filter",
+            "metadata": {
+                "label": "Message Filter",
+                "x": 555.9999980926514,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "condition": {
+                        "ordergen.last": true,
+                        "daterange.last": true
+                    }
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 724.9999980926514,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "python3operator211": {
+            "component": "com.sap.system.python3Operator",
+            "metadata": {
+                "label": "Next Date",
+                "x": 16.999999046325684,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import time\nimport datetime\nimport re\n\ndefault_last_date=\"2018-12-31\"\n\ndef on_input(msg):\n    # get lines (each is a file)\n    fns = msg.body.split(\"\\n\")\n    \n    # get all dates occuring in file paths\n    parsed_dates = []\n    for fn in fns:\n        dates = re.findall(\"\\d{4}-\\d{2}-\\d{2}\", fn)\n        if dates:\n            parsed_dates.append(dates[-1])\n            \n    # get latest date or use default\n    last_date = default_last_date\n    if parsed_dates:\n        parsed_dates.sort()\n        last_date = parsed_dates[-1]\n    \n    # compute next day\n    last_datetime = datetime.datetime.strptime(last_date, \"%Y-%m-%d\")\n    new_date = datetime.datetime.strftime(last_datetime + datetime.timedelta(days=1), \"%Y-%m-%d\")\n    \n    attr = msg.attributes.copy()\n    attr.update({\"daterange.last\": True, \"daterange.value\": new_date})\n    api.send(\"output\", api.Message(new_date, attr))\n    \n    # block because of storage.read bug\n    while True:\n        time.sleep(1)\n    \napi.set_port_callback(\"input\", on_input)\n\n"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "message"
+                    }
+                ]
+            },
+            "name": "python3operator21"
+        },
+        "datetimerange1": {
+            "component": "com.sap.datatools.daterange",
+            "metadata": {
+                "label": "Datetime Range",
+                "x": 17,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "outstring": "",
+                    "rangeconfig": {
+                        "date_from": "2019-01-01",
+                        "date_to": "2019-01-10",
+                        "delta": "1d"
+                    }
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "679.9999980926514,172 719.9999980926514,172"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagefilter1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "-27,43 -7.5,43 -7.5,52 11.999999046325684,52"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile2"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "python3operator211"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,301 173,301 173,181 204.99999904632568,181"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "orders",
+                "process": "python3operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,172 173,172 173,163 204.99999904632568,163"
+            },
+            "src": {
+                "port": "output",
+                "process": "datetimerange1"
+            },
+            "tgt": {
+                "port": "newdate",
+                "process": "python3operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "333.9999990463257,172 381.99999809265137,172"
+            },
+            "src": {
+                "port": "output",
+                "process": "python3operator1"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "510.99999809265137,172 550.9999980926514,172"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagefilter1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/com.sap.datatools.line_collector.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "encoding": {
+            "title": "Encoding",
+            "type": "string"
+        },
+        "num_lines": {
+            "title": "Number of lines",
+            "type": "integer"
+        },
+        "final_condition": {
+            "title": "Final Condition",
+            "type": "object",
+            "properties": {}
+        }
+    }
+}

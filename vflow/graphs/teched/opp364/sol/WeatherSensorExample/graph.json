@@ -1,0 +1,234 @@
+{
+    "properties": {},
+    "description": "Weather Sensor Example",
+    "processes": {
+        "weathersensor1": {
+            "component": "teched.opp364.sol.weather_sensor",
+            "metadata": {
+                "label": "weather_sensor",
+                "x": 24,
+                "y": 100,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "javascriptoperator1": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "CSV Aggregator",
+                "x": 433.99999809265137,
+                "y": 40,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "numMeasuresPerFile": "100",
+                    "script": "var num = 0;\r\nvar output = \"\";\r\n\r\n$.setPortCallback(\"input\",onInput);\r\n\r\nfunction onInput(ctx,input) {\r\n\r\n    if ( num == $.config.getInt(\"numMeasuresPerFile\") ) {\r\n        num = 0;\r\n        $.output(output);    \r\n        output = \"\";\r\n    } else {\r\n        num++;\r\n        output += input + \"\\n\";\r\n    }\r\n}"
+                }
+            }
+        },
+        "toblobconverter1": {
+            "component": "com.sap.util.toBlobConverter",
+            "metadata": {
+                "label": "ToBlob Converter",
+                "x": 602.9999980926514,
+                "y": 55,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 701.9999980926514,
+                "y": 40,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "hdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "path": "/teched/opp364/weather_sensors_sol/file_<date><time>_<counter>.csv",
+                    "mode": "create"
+                }
+            }
+        },
+        "12multiplexer1": {
+            "component": "com.sap.system.multiplexer.1-2",
+            "metadata": {
+                "label": "1:2 Multiplexer",
+                "x": 228.99999904632568,
+                "y": 92,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "terminal2": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Terminal",
+                "x": 416.99999809265137,
+                "y": 172,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "terminal1": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Terminal",
+                "x": 1005.999997138977,
+                "y": 92,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "tostringconverter1": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 906.999997138977,
+                "y": 107,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        }
+    },
+    "groups": [
+        {
+            "name": "group1",
+            "nodes": [
+                "weathersensor1"
+            ],
+            "metadata": {
+                "description": "Sensor Group"
+            },
+            "multiplicity": 5
+        },
+        {
+            "name": "group2",
+            "nodes": [
+                "javascriptoperator1",
+                "toblobconverter1",
+                "writefile1"
+            ],
+            "metadata": {
+                "description": "Datalake Writer"
+            },
+            "multiplicity": 2
+        }
+    ],
+    "connections": [
+        {
+            "metadata": {
+                "points": "148,140 195.99999952316284,140 195.99999952316284,132 223.99999904632568,132"
+            },
+            "src": {
+                "port": "output",
+                "process": "weathersensor1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "12multiplexer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "557.9999980926514,80 597.9999980926514,80"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "toblobconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "656.9999980926514,80 696.9999980926514,80"
+            },
+            "src": {
+                "port": "outbytearray",
+                "process": "toblobconverter1"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "352.9999990463257,123 380.9999985694885,123 380.9999985694885,80 428.99999809265137,80"
+            },
+            "src": {
+                "port": "out1",
+                "process": "12multiplexer1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "352.9999990463257,141 380.9999985694885,141 380.9999985694885,212 411.99999809265137,212"
+            },
+            "src": {
+                "port": "out2",
+                "process": "12multiplexer1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "825.9999980926514,80 873.9999976158142,80 873.9999976158142,123 901.999997138977,123"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "960.999997138977,132 1000.999997138977,132"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

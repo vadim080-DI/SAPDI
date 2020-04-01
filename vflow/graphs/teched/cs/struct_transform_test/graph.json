@@ -1,0 +1,524 @@
+{
+    "description": "Struct Transform Test (CS)",
+    "processes": {
+        "datatransform1": {
+            "component": "com.sap.dh.datatransform",
+            "metadata": {
+                "label": "Data Transform",
+                "x": 415,
+                "y": 116,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "definition": {
+                        "nodeType": "ContainerNode",
+                        "inputs": [
+                            {
+                                "id": "b147fc36-adf3-4fee-9462-46b67b9ca302",
+                                "nodeType": "DataNode",
+                                "name": "DataSource1",
+                                "UILayout": {
+                                    "x": 120,
+                                    "y": 152,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "HDFS",
+                                            "type": "HDFS"
+                                        },
+                                        "name": "product.csv",
+                                        "remoteObjectType": "FILE.CSV",
+                                        "qualifiedName": "/DAT263/product.csv",
+                                        "nativeQualifiedName": "/DAT263/product.csv",
+                                        "owner": "hdfs",
+                                        "size": 22174,
+                                        "version": {
+                                            "dataLastModified": 1535975144000,
+                                            "metadataLastModified": 1535975144000,
+                                            "metadataVersionNumber": 1535975144000
+                                        }
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    },
+                                    "dataAccessConfiguration": {
+                                        "rowDelimiter": "\n",
+                                        "charset": "UTF-8",
+                                        "textDelimiter": "\"",
+                                        "header": true,
+                                        "escapeCharacter": "\"",
+                                        "colDelimiter": ","
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "9f700a3f-83ef-452b-9a38-ea352b8f8abc",
+                                        "name": "PRODUCTID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "e2f80901-07c7-427c-b186-529faa797845",
+                                        "name": "CATEGORY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 23
+                                    },
+                                    {
+                                        "id": "3953b708-1f61-465b-8001-9733725641d1",
+                                        "name": "CREATEDAT",
+                                        "datatype": "DATE",
+                                        "nullable": false,
+                                        "format": "yyyy/MM/dd"
+                                    },
+                                    {
+                                        "id": "ac2a126f-b04d-42b5-bc20-2d3b3642e236",
+                                        "name": "CHANGEDAT",
+                                        "datatype": "DATE",
+                                        "nullable": false,
+                                        "format": "yyyy/MM/dd"
+                                    },
+                                    {
+                                        "id": "64dad307-c86c-4223-92e4-53e1870b24d7",
+                                        "name": "PRODUCTNAME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 38
+                                    },
+                                    {
+                                        "id": "bd2c4fa8-73d5-4948-8e78-5587ccecd05b",
+                                        "name": "PRODUCTDESC",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 200
+                                    },
+                                    {
+                                        "id": "702c3dc0-69e6-42c0-80cd-7a207d780217",
+                                        "name": "WEIGHTMEASURE",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 4,
+                                        "scale": 3,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "3988b084-4c49-4c97-9756-4ad20aff9ac0",
+                                        "name": "PRICE",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 5,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "2033d412-f31f-44b6-9642-4c0ea03347b6",
+                                        "name": "PRODUCTPICURL",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 53
+                                    },
+                                    {
+                                        "id": "99ebc308-be0a-44fc-ab3b-9959e9e2c829",
+                                        "name": "WIDTH",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 3,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "2072c499-8eb6-4c88-a834-3fe844fc4199",
+                                        "name": "DEPTH",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 3,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "1c0d56a2-ca22-4ae0-af33-d7c19373cca8",
+                                        "name": "HEIGHT",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 3,
+                                        "scale": 2,
+                                        "format": ""
+                                    }
+                                ]
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "id": "45ce4429-22d5-43dd-aa19-17c0816bfb12",
+                                "nodeType": "DataNode",
+                                "name": "DataTarget1",
+                                "UILayout": {
+                                    "x": 579,
+                                    "y": 185,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "HDFS",
+                                            "type": "HDFS"
+                                        },
+                                        "qualifiedName": "/tmp/blaaa.csv",
+                                        "remoteObjectType": "FILE.CSV"
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    },
+                                    "dataAccessConfiguration": {
+                                        "colDelimiter": ",",
+                                        "rowDelimiter": "\n",
+                                        "header": true,
+                                        "textDelimiter": "\"",
+                                        "escapeCharacter": "",
+                                        "charset": "UTF-8"
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "9b5093b5-eeaa-4f29-a6bd-7ecf4916d8d2",
+                                        "name": "PRODUCTID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "bda98154-f8c6-434e-8fe4-f0bddb05f7f3",
+                                        "name": "CHANGEDAT",
+                                        "datatype": "DATE",
+                                        "nullable": false,
+                                        "format": "yyyy/MM/dd"
+                                    },
+                                    {
+                                        "id": "97dab550-af6b-4eb3-89cd-552f64d0e786",
+                                        "name": "CREATEDAT",
+                                        "datatype": "DATE",
+                                        "nullable": false,
+                                        "format": "yyyy/MM/dd"
+                                    },
+                                    {
+                                        "id": "e7cbe3f7-181d-4a89-b73a-8e7f0c8318ad",
+                                        "name": "PRICE",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 5,
+                                        "scale": 2,
+                                        "format": ""
+                                    }
+                                ],
+                                "mode": "OVERWRITE"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "id": "18e14b96-6292-42f0-b112-222792db89d0",
+                                "type": "FilterNode",
+                                "nodeType": "FilterNode",
+                                "name": "Projection1",
+                                "UILayout": {
+                                    "x": 339,
+                                    "y": 174,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "inputs": [
+                                    {
+                                        "id": "9af57566-0d74-4fd3-84ba-2e76c705d377",
+                                        "name": "Projection1_Input1",
+                                        "attributes": [
+                                            {
+                                                "id": "718723f7-7635-4df5-b4a0-b1badf17d7d2",
+                                                "name": "PRODUCTID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "af890710-a947-4d08-aac2-a031300aabac",
+                                                "name": "CATEGORY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 23
+                                            },
+                                            {
+                                                "id": "d95664a4-8ddc-4aa4-a46b-095a9c9b68f8",
+                                                "name": "CREATEDAT",
+                                                "datatype": "DATE",
+                                                "nullable": false,
+                                                "format": "yyyy/MM/dd"
+                                            },
+                                            {
+                                                "id": "8b3da410-3c42-4f43-bfdf-3e3d3c2f9cfe",
+                                                "name": "CHANGEDAT",
+                                                "datatype": "DATE",
+                                                "nullable": false,
+                                                "format": "yyyy/MM/dd"
+                                            },
+                                            {
+                                                "id": "dabec04c-3cfb-4b8a-93dd-404f6e94415e",
+                                                "name": "PRODUCTNAME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 38
+                                            },
+                                            {
+                                                "id": "877ee3e2-acc5-474b-a73f-aca3a633eee5",
+                                                "name": "PRODUCTDESC",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 200
+                                            },
+                                            {
+                                                "id": "e39487b5-1c97-4d4b-b2b3-dad2d2d4ec0f",
+                                                "name": "WEIGHTMEASURE",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 4,
+                                                "scale": 3,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "84af638d-a0bd-45b5-80bb-1f3e620646b5",
+                                                "name": "PRICE",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 5,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "538e8451-cf3b-4d7d-b07c-3f7ce063b824",
+                                                "name": "PRODUCTPICURL",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 53
+                                            },
+                                            {
+                                                "id": "ccdb0d87-65ce-406a-b2fd-db18e5939a1a",
+                                                "name": "WIDTH",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 3,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "6b0dc474-9343-459c-8218-429377a02663",
+                                                "name": "DEPTH",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 3,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "66603c65-7633-4274-8222-b40cb84ebb85",
+                                                "name": "HEIGHT",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 3,
+                                                "scale": 2,
+                                                "format": ""
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "outputs": [
+                                    {
+                                        "id": "d01d94bd-e7e4-4e32-a191-b046e23c304a",
+                                        "name": "Projection1_Output1",
+                                        "attributes": [
+                                            {
+                                                "id": "0bbd7dc3-114c-4113-b8f3-6e32f8c3244c",
+                                                "name": "PRODUCTID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7,
+                                                "expression": "\"PRODUCTID\""
+                                            },
+                                            {
+                                                "id": "0a1571f0-f385-4e30-9fa7-d7b18b0d0f0a",
+                                                "name": "CHANGEDAT",
+                                                "datatype": "DATE",
+                                                "nullable": false,
+                                                "format": "yyyy/MM/dd",
+                                                "expression": "\"CHANGEDAT\""
+                                            },
+                                            {
+                                                "id": "bbc74b74-eb30-4765-a2d2-71b7fe8f87c0",
+                                                "name": "CREATEDAT",
+                                                "datatype": "DATE",
+                                                "nullable": false,
+                                                "format": "yyyy/MM/dd",
+                                                "expression": "\"CREATEDAT\""
+                                            },
+                                            {
+                                                "id": "39b71d56-907e-41d2-a45d-4c6c7b198c10",
+                                                "name": "PRICE",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 5,
+                                                "scale": 2,
+                                                "format": "",
+                                                "expression": "\"PRICE\""
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "tableMappings": [
+                            {
+                                "source": "b147fc36-adf3-4fee-9462-46b67b9ca302",
+                                "target": "9af57566-0d74-4fd3-84ba-2e76c705d377",
+                                "UILayout": {
+                                    "points": "245,192 289.5,192 289.5,214 334,214"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "9f700a3f-83ef-452b-9a38-ea352b8f8abc",
+                                        "target": "718723f7-7635-4df5-b4a0-b1badf17d7d2"
+                                    },
+                                    {
+                                        "source": "e2f80901-07c7-427c-b186-529faa797845",
+                                        "target": "af890710-a947-4d08-aac2-a031300aabac"
+                                    },
+                                    {
+                                        "source": "3953b708-1f61-465b-8001-9733725641d1",
+                                        "target": "d95664a4-8ddc-4aa4-a46b-095a9c9b68f8"
+                                    },
+                                    {
+                                        "source": "ac2a126f-b04d-42b5-bc20-2d3b3642e236",
+                                        "target": "8b3da410-3c42-4f43-bfdf-3e3d3c2f9cfe"
+                                    },
+                                    {
+                                        "source": "64dad307-c86c-4223-92e4-53e1870b24d7",
+                                        "target": "dabec04c-3cfb-4b8a-93dd-404f6e94415e"
+                                    },
+                                    {
+                                        "source": "bd2c4fa8-73d5-4948-8e78-5587ccecd05b",
+                                        "target": "877ee3e2-acc5-474b-a73f-aca3a633eee5"
+                                    },
+                                    {
+                                        "source": "702c3dc0-69e6-42c0-80cd-7a207d780217",
+                                        "target": "e39487b5-1c97-4d4b-b2b3-dad2d2d4ec0f"
+                                    },
+                                    {
+                                        "source": "3988b084-4c49-4c97-9756-4ad20aff9ac0",
+                                        "target": "84af638d-a0bd-45b5-80bb-1f3e620646b5"
+                                    },
+                                    {
+                                        "source": "2033d412-f31f-44b6-9642-4c0ea03347b6",
+                                        "target": "538e8451-cf3b-4d7d-b07c-3f7ce063b824"
+                                    },
+                                    {
+                                        "source": "99ebc308-be0a-44fc-ab3b-9959e9e2c829",
+                                        "target": "ccdb0d87-65ce-406a-b2fd-db18e5939a1a"
+                                    },
+                                    {
+                                        "source": "2072c499-8eb6-4c88-a834-3fe844fc4199",
+                                        "target": "6b0dc474-9343-459c-8218-429377a02663"
+                                    },
+                                    {
+                                        "source": "1c0d56a2-ca22-4ae0-af33-d7c19373cca8",
+                                        "target": "66603c65-7633-4274-8222-b40cb84ebb85"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "d01d94bd-e7e4-4e32-a191-b046e23c304a",
+                                "target": "45ce4429-22d5-43dd-aa19-17c0816bfb12",
+                                "UILayout": {
+                                    "points": "464,214 519,214 519,225 574,225"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "0bbd7dc3-114c-4113-b8f3-6e32f8c3244c",
+                                        "target": "9b5093b5-eeaa-4f29-a6bd-7ecf4916d8d2"
+                                    },
+                                    {
+                                        "source": "0a1571f0-f385-4e30-9fa7-d7b18b0d0f0a",
+                                        "target": "bda98154-f8c6-434e-8fe4-f0bddb05f7f3"
+                                    },
+                                    {
+                                        "source": "bbc74b74-eb30-4765-a2d2-71b7fe8f87c0",
+                                        "target": "97dab550-af6b-4eb3-89cd-552f64d0e786"
+                                    },
+                                    {
+                                        "source": "39b71d56-907e-41d2-a45d-4c6c7b198c10",
+                                        "target": "e7cbe3f7-181d-4a89-b73a-8e7f0c8318ad"
+                                    }
+                                ]
+                            }
+                        ],
+                        "invalidMappings": []
+                    }
+                }
+            }
+        },
+        "terminal1": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Terminal",
+                "x": 585,
+                "y": 116,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "539,147 559.5,147 559.5,156 580,156"
+            },
+            "src": {
+                "port": "output",
+                "process": "datatransform1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "709,156 759,156 759,101 360,101 360,156 410,156"
+            },
+            "src": {
+                "port": "out1",
+                "process": "terminal1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "datatransform1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {},
+    "properties": {}
+}

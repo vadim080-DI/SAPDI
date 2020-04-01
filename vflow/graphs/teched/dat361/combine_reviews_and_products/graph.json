@@ -1,0 +1,855 @@
+{
+    "properties": {},
+    "description": "DAT361: Combine Reviews & Products",
+    "processes": {
+        "datatransform1": {
+            "component": "com.sap.dh.datatransform",
+            "metadata": {
+                "label": "Data Transform",
+                "x": 365.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "definition": {
+                        "nodeType": "ContainerNode",
+                        "inputs": [
+                            {
+                                "id": "47482e67-7018-4405-8de3-74e5c602b3af",
+                                "nodeType": "DataNode",
+                                "name": "DataSource1",
+                                "UILayout": {
+                                    "x": -41,
+                                    "y": 11,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "HDFS",
+                                            "type": "HDFS"
+                                        },
+                                        "name": "product.csv",
+                                        "remoteObjectType": "FILE.CSV",
+                                        "qualifiedName": "/DAT361/product.csv",
+                                        "nativeQualifiedName": "/DAT361/product.csv",
+                                        "owner": "hdfs",
+                                        "size": 22155,
+                                        "version": {
+                                            "dataLastModified": 1536678821000,
+                                            "metadataLastModified": 1536678821000,
+                                            "metadataVersionNumber": 1536678821000
+                                        }
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    },
+                                    "dataAccessConfiguration": {
+                                        "rowDelimiter": "\n",
+                                        "charset": "UTF-8",
+                                        "textDelimiter": "\"",
+                                        "header": true,
+                                        "escapeCharacter": "\"",
+                                        "colDelimiter": ","
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "629c74f8-a253-4c11-b634-006e2c37c1fe",
+                                        "name": "ID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "f27eea04-6c86-494e-b298-b2317bb2f0ca",
+                                        "name": "CATEGORY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 23
+                                    },
+                                    {
+                                        "id": "51e75494-ba2d-45c4-8b1a-20fe53d9e272",
+                                        "name": "CREATE_DATE",
+                                        "datatype": "DATE",
+                                        "nullable": false,
+                                        "format": "yyyy/MM/dd"
+                                    },
+                                    {
+                                        "id": "1a12e0a2-003d-4939-9267-a7bbac3f6897",
+                                        "name": "CHANGE_DATE",
+                                        "datatype": "DATE",
+                                        "nullable": false,
+                                        "format": "yyyy/MM/dd"
+                                    },
+                                    {
+                                        "id": "4628686d-0dc3-45a8-92d6-c3af3fb9928c",
+                                        "name": "NAME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 38
+                                    },
+                                    {
+                                        "id": "906b1617-783e-4459-b960-9a7d6c3276e1",
+                                        "name": "DESCRIPTION",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 200
+                                    },
+                                    {
+                                        "id": "ef4991e5-385b-441f-942c-9b9a3c47c5d8",
+                                        "name": "WEIGHT",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 4,
+                                        "scale": 3,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "6c30be8e-102d-423b-970b-20b1f231255f",
+                                        "name": "PRICE",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 5,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "4e225bb8-6b21-4029-9005-4c36e4075390",
+                                        "name": "PICTURE_URL",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 53
+                                    },
+                                    {
+                                        "id": "d476a4dc-b4a7-43d0-b23e-2c09c41153ab",
+                                        "name": "WIDTH",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 3,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "80035353-0d5a-481d-abb6-b9e603af5c05",
+                                        "name": "DEPTH",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 3,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "f161bce1-11a7-46ed-968d-ca7caa620a09",
+                                        "name": "HEIGHT",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 3,
+                                        "scale": 2,
+                                        "format": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "858d114c-e1d4-4b7b-b919-53c97119034b",
+                                "nodeType": "DataNode",
+                                "name": "DataSource2",
+                                "UILayout": {
+                                    "x": -41,
+                                    "y": 159,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "VORA",
+                                            "type": "VORA"
+                                        },
+                                        "name": "PRODUCT_REVIEWS",
+                                        "remoteObjectType": "TABLE.STREAMING",
+                                        "qualifiedName": "/DAT361/PRODUCT_REVIEWS",
+                                        "nativeQualifiedName": "DAT361.PRODUCT_REVIEWS",
+                                        "version": {}
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "a21c1c78-18e9-4f79-a3a6-8a4fed89eb1a",
+                                        "name": "MD5",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 32
+                                    },
+                                    {
+                                        "id": "c3354ca8-f067-4493-90a7-cf4f7e159dc5",
+                                        "name": "ID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "d0b768df-0e3c-4f72-8965-ec61edba7164",
+                                        "name": "LENGTH",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "c4569522-8b76-4450-9c29-99f356fe2f05",
+                                        "name": "TEXT",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 1024
+                                    },
+                                    {
+                                        "id": "cd847953-297f-435d-95ce-746c7f2a0569",
+                                        "name": "POLARITY",
+                                        "datatype": "FLOATING",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "038b885e-d8aa-40e5-bd62-dec7203f2553",
+                                        "name": "SUBJECTIVITY",
+                                        "datatype": "FLOATING",
+                                        "nullable": false
+                                    }
+                                ]
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "id": "4932b26f-a5fe-40a5-97f7-6f611a304017",
+                                "nodeType": "DataNode",
+                                "name": "DataTarget1",
+                                "UILayout": {
+                                    "x": 432,
+                                    "y": 103,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "VORA",
+                                            "type": "VORA"
+                                        },
+                                        "name": "PRODUCTS",
+                                        "remoteObjectType": "TABLE.STREAMING",
+                                        "qualifiedName": "/DAT361/PRODUCTS",
+                                        "nativeQualifiedName": "DAT361.PRODUCTS",
+                                        "version": {}
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "caf75db9-25af-456f-8311-6e69c136688b",
+                                        "name": "MD5",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "primarykey": true,
+                                        "length": 32
+                                    },
+                                    {
+                                        "id": "0586a33c-1ff5-4195-9811-f3980bbc034e",
+                                        "name": "ID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "dd6b3217-aa38-464d-8f0c-a12fff53b510",
+                                        "name": "NAME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 38
+                                    },
+                                    {
+                                        "id": "5c74e0ea-4021-45b5-8f6b-4200999f9c3d",
+                                        "name": "CATEGORY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 23
+                                    },
+                                    {
+                                        "id": "50f6820b-5e55-4d43-9b13-614196d858ae",
+                                        "name": "PRICE",
+                                        "datatype": "DECIMAL",
+                                        "nullable": false,
+                                        "precision": 5,
+                                        "scale": 2,
+                                        "format": ""
+                                    },
+                                    {
+                                        "id": "892ab852-7fb8-4347-8738-15fa8d458144",
+                                        "name": "TEXT",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 1024
+                                    },
+                                    {
+                                        "id": "866bc154-7aa3-46de-b6c9-0d88c84a9aed",
+                                        "name": "LENGTH",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "8555a4ae-6a64-42f3-a849-79305b43a555",
+                                        "name": "POLARITY",
+                                        "datatype": "FLOATING",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "fcec109f-dc3c-4acb-9a8f-17f51a061117",
+                                        "name": "SUBJECTIVITY",
+                                        "datatype": "FLOATING",
+                                        "nullable": false
+                                    }
+                                ],
+                                "mode": "OVERWRITE"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "id": "3d31c258-77c0-4585-869d-bcb0e04d63ab",
+                                "type": "JoinNode",
+                                "nodeType": "JoinNode",
+                                "name": "Join1",
+                                "UILayout": {
+                                    "x": 241,
+                                    "y": 113,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "inputs": [
+                                    {
+                                        "id": "9e808877-cc3d-432d-954a-7fcf50689aab",
+                                        "name": "Join1_Input1",
+                                        "attributes": [
+                                            {
+                                                "id": "a9427dea-e9c1-44d2-b260-6f78922a725a",
+                                                "name": "ID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "f69c76cc-47f9-47bf-b856-a0e22d89a37f",
+                                                "name": "CATEGORY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 23
+                                            },
+                                            {
+                                                "id": "e33752d2-9596-49e5-bb46-6443d8404c31",
+                                                "name": "CREATE_DATE",
+                                                "datatype": "DATE",
+                                                "nullable": false,
+                                                "format": "yyyy/MM/dd"
+                                            },
+                                            {
+                                                "id": "ed15496f-5f04-4f4f-8725-79412918a2a7",
+                                                "name": "CHANGE_DATE",
+                                                "datatype": "DATE",
+                                                "nullable": false,
+                                                "format": "yyyy/MM/dd"
+                                            },
+                                            {
+                                                "id": "a0ada736-f083-49d8-b608-7f5b63c8fe35",
+                                                "name": "NAME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 38
+                                            },
+                                            {
+                                                "id": "64e06349-f37f-4cc1-8bab-9856715534a1",
+                                                "name": "DESCRIPTION",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 200
+                                            },
+                                            {
+                                                "id": "6dcca387-9ac5-44b5-98f6-a30f84468751",
+                                                "name": "WEIGHT",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 4,
+                                                "scale": 3,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "2161d628-d62f-4fb2-a890-bf06a90f70b6",
+                                                "name": "PRICE",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 5,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "6ec6a72e-0f56-4c62-801b-7701303b8815",
+                                                "name": "PICTURE_URL",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 53
+                                            },
+                                            {
+                                                "id": "087ad2b0-c84f-4e2e-a80c-894f2dbff603",
+                                                "name": "WIDTH",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 3,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "51473cb6-a6c9-4f00-a0ec-0a6a3ebc446d",
+                                                "name": "DEPTH",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 3,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "d112e4c9-29e5-42d2-8ced-819b8efd6dba",
+                                                "name": "HEIGHT",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 3,
+                                                "scale": 2,
+                                                "format": ""
+                                            }
+                                        ],
+                                        "UILayout": {
+                                            "x": 12,
+                                            "y": 12
+                                        }
+                                    },
+                                    {
+                                        "id": "0c37b3e8-7e04-4281-a38d-6f643909387e",
+                                        "name": "Join1_Input2",
+                                        "attributes": [
+                                            {
+                                                "id": "7cdb0fd7-ae05-44d6-92ad-30b08a2256af",
+                                                "name": "MD5",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 32
+                                            },
+                                            {
+                                                "id": "455f6229-0bec-4cee-a9da-58a0ed7ca6a7",
+                                                "name": "ID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "7b74290f-ce9b-4feb-8824-1b630dfc66b2",
+                                                "name": "LENGTH",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "90dfa273-3080-4bdb-9ea0-fcea6a17cc3e",
+                                                "name": "TEXT",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 1024
+                                            },
+                                            {
+                                                "id": "18f28f85-f5c7-4957-bdab-f8adfa69beee",
+                                                "name": "POLARITY",
+                                                "datatype": "FLOATING",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "30edfc6b-4ee5-48de-aaa2-4477781045e1",
+                                                "name": "SUBJECTIVITY",
+                                                "datatype": "FLOATING",
+                                                "nullable": false
+                                            }
+                                        ],
+                                        "UILayout": {
+                                            "x": 13.119873046875,
+                                            "y": 322
+                                        }
+                                    }
+                                ],
+                                "outputs": [
+                                    {
+                                        "id": "4dd79c04-ab68-459f-8166-d3695ffc72f6",
+                                        "name": "Join1_Output1",
+                                        "attributes": [
+                                            {
+                                                "id": "6572d004-f589-4f52-8414-0a33683f5d2e",
+                                                "name": "MD5",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 32
+                                            },
+                                            {
+                                                "id": "8465374e-ad43-4a3e-9cab-5d5b501e0e5b",
+                                                "name": "ID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "2b1806db-6815-4ad9-92db-a93d9e38157c",
+                                                "name": "NAME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 38
+                                            },
+                                            {
+                                                "id": "1df5ea83-2ab0-46d9-97b2-022139a86799",
+                                                "name": "CATEGORY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 23
+                                            },
+                                            {
+                                                "id": "fb1498a4-b9be-4d46-84be-6312e21d1310",
+                                                "name": "PRICE",
+                                                "datatype": "DECIMAL",
+                                                "nullable": false,
+                                                "precision": 5,
+                                                "scale": 2,
+                                                "format": ""
+                                            },
+                                            {
+                                                "id": "22277abb-3b40-45a1-81e2-bb9e0b84f853",
+                                                "name": "TEXT",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 1024
+                                            },
+                                            {
+                                                "id": "fd0cfd0a-cf5e-46a7-9814-c26d0a20e740",
+                                                "name": "LENGTH",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "db87d799-af09-4e61-a8a7-454c1388a948",
+                                                "name": "POLARITY",
+                                                "datatype": "FLOATING",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "acf3badf-5d0c-4176-ba4e-3039d480ae4b",
+                                                "name": "SUBJECTIVITY",
+                                                "datatype": "FLOATING",
+                                                "nullable": false
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "joinDefinitions": [
+                                    {
+                                        "left": "9e808877-cc3d-432d-954a-7fcf50689aab",
+                                        "right": "0c37b3e8-7e04-4281-a38d-6f643909387e",
+                                        "type": "INNER",
+                                        "condition": "\"Join1_Input1\".\"ID\" = \"Join1_Input2\".\"ID\""
+                                    }
+                                ],
+                                "tableMappings": [
+                                    {
+                                        "source": "0c37b3e8-7e04-4281-a38d-6f643909387e",
+                                        "target": "4dd79c04-ab68-459f-8166-d3695ffc72f6",
+                                        "attributeMappings": [
+                                            {
+                                                "source": "7cdb0fd7-ae05-44d6-92ad-30b08a2256af",
+                                                "target": "6572d004-f589-4f52-8414-0a33683f5d2e"
+                                            },
+                                            {
+                                                "source": "455f6229-0bec-4cee-a9da-58a0ed7ca6a7",
+                                                "target": "8465374e-ad43-4a3e-9cab-5d5b501e0e5b"
+                                            },
+                                            {
+                                                "source": "90dfa273-3080-4bdb-9ea0-fcea6a17cc3e",
+                                                "target": "22277abb-3b40-45a1-81e2-bb9e0b84f853"
+                                            },
+                                            {
+                                                "source": "7b74290f-ce9b-4feb-8824-1b630dfc66b2",
+                                                "target": "fd0cfd0a-cf5e-46a7-9814-c26d0a20e740"
+                                            },
+                                            {
+                                                "source": "18f28f85-f5c7-4957-bdab-f8adfa69beee",
+                                                "target": "db87d799-af09-4e61-a8a7-454c1388a948"
+                                            },
+                                            {
+                                                "source": "30edfc6b-4ee5-48de-aaa2-4477781045e1",
+                                                "target": "acf3badf-5d0c-4176-ba4e-3039d480ae4b"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "source": "9e808877-cc3d-432d-954a-7fcf50689aab",
+                                        "target": "4dd79c04-ab68-459f-8166-d3695ffc72f6",
+                                        "attributeMappings": [
+                                            {
+                                                "source": "a0ada736-f083-49d8-b608-7f5b63c8fe35",
+                                                "target": "2b1806db-6815-4ad9-92db-a93d9e38157c"
+                                            },
+                                            {
+                                                "source": "f69c76cc-47f9-47bf-b856-a0e22d89a37f",
+                                                "target": "1df5ea83-2ab0-46d9-97b2-022139a86799"
+                                            },
+                                            {
+                                                "source": "2161d628-d62f-4fb2-a890-bf06a90f70b6",
+                                                "target": "fb1498a4-b9be-4d46-84be-6312e21d1310"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "tableMappings": [
+                            {
+                                "source": "47482e67-7018-4405-8de3-74e5c602b3af",
+                                "target": "9e808877-cc3d-432d-954a-7fcf50689aab",
+                                "UILayout": {
+                                    "points": "84,51 160,51 160,144 236,144"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "629c74f8-a253-4c11-b634-006e2c37c1fe",
+                                        "target": "a9427dea-e9c1-44d2-b260-6f78922a725a"
+                                    },
+                                    {
+                                        "source": "f27eea04-6c86-494e-b298-b2317bb2f0ca",
+                                        "target": "f69c76cc-47f9-47bf-b856-a0e22d89a37f"
+                                    },
+                                    {
+                                        "source": "51e75494-ba2d-45c4-8b1a-20fe53d9e272",
+                                        "target": "e33752d2-9596-49e5-bb46-6443d8404c31"
+                                    },
+                                    {
+                                        "source": "1a12e0a2-003d-4939-9267-a7bbac3f6897",
+                                        "target": "ed15496f-5f04-4f4f-8725-79412918a2a7"
+                                    },
+                                    {
+                                        "source": "4628686d-0dc3-45a8-92d6-c3af3fb9928c",
+                                        "target": "a0ada736-f083-49d8-b608-7f5b63c8fe35"
+                                    },
+                                    {
+                                        "source": "906b1617-783e-4459-b960-9a7d6c3276e1",
+                                        "target": "64e06349-f37f-4cc1-8bab-9856715534a1"
+                                    },
+                                    {
+                                        "source": "ef4991e5-385b-441f-942c-9b9a3c47c5d8",
+                                        "target": "6dcca387-9ac5-44b5-98f6-a30f84468751"
+                                    },
+                                    {
+                                        "source": "6c30be8e-102d-423b-970b-20b1f231255f",
+                                        "target": "2161d628-d62f-4fb2-a890-bf06a90f70b6"
+                                    },
+                                    {
+                                        "source": "4e225bb8-6b21-4029-9005-4c36e4075390",
+                                        "target": "6ec6a72e-0f56-4c62-801b-7701303b8815"
+                                    },
+                                    {
+                                        "source": "d476a4dc-b4a7-43d0-b23e-2c09c41153ab",
+                                        "target": "087ad2b0-c84f-4e2e-a80c-894f2dbff603"
+                                    },
+                                    {
+                                        "source": "80035353-0d5a-481d-abb6-b9e603af5c05",
+                                        "target": "51473cb6-a6c9-4f00-a0ec-0a6a3ebc446d"
+                                    },
+                                    {
+                                        "source": "f161bce1-11a7-46ed-968d-ca7caa620a09",
+                                        "target": "d112e4c9-29e5-42d2-8ced-819b8efd6dba"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "858d114c-e1d4-4b7b-b919-53c97119034b",
+                                "target": "0c37b3e8-7e04-4281-a38d-6f643909387e",
+                                "UILayout": {
+                                    "points": "84,199 160,199 160,162 236,162"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "a21c1c78-18e9-4f79-a3a6-8a4fed89eb1a",
+                                        "target": "7cdb0fd7-ae05-44d6-92ad-30b08a2256af"
+                                    },
+                                    {
+                                        "source": "c3354ca8-f067-4493-90a7-cf4f7e159dc5",
+                                        "target": "455f6229-0bec-4cee-a9da-58a0ed7ca6a7"
+                                    },
+                                    {
+                                        "source": "d0b768df-0e3c-4f72-8965-ec61edba7164",
+                                        "target": "7b74290f-ce9b-4feb-8824-1b630dfc66b2"
+                                    },
+                                    {
+                                        "source": "c4569522-8b76-4450-9c29-99f356fe2f05",
+                                        "target": "90dfa273-3080-4bdb-9ea0-fcea6a17cc3e"
+                                    },
+                                    {
+                                        "source": "cd847953-297f-435d-95ce-746c7f2a0569",
+                                        "target": "18f28f85-f5c7-4957-bdab-f8adfa69beee"
+                                    },
+                                    {
+                                        "source": "038b885e-d8aa-40e5-bd62-dec7203f2553",
+                                        "target": "30edfc6b-4ee5-48de-aaa2-4477781045e1"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "4dd79c04-ab68-459f-8166-d3695ffc72f6",
+                                "target": "4932b26f-a5fe-40a5-97f7-6f611a304017",
+                                "UILayout": {
+                                    "points": "366,153 396.5,153 396.5,143 427,143"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "6572d004-f589-4f52-8414-0a33683f5d2e",
+                                        "target": "caf75db9-25af-456f-8311-6e69c136688b"
+                                    },
+                                    {
+                                        "source": "8465374e-ad43-4a3e-9cab-5d5b501e0e5b",
+                                        "target": "0586a33c-1ff5-4195-9811-f3980bbc034e"
+                                    },
+                                    {
+                                        "source": "2b1806db-6815-4ad9-92db-a93d9e38157c",
+                                        "target": "dd6b3217-aa38-464d-8f0c-a12fff53b510"
+                                    },
+                                    {
+                                        "source": "1df5ea83-2ab0-46d9-97b2-022139a86799",
+                                        "target": "5c74e0ea-4021-45b5-8f6b-4200999f9c3d"
+                                    },
+                                    {
+                                        "source": "fb1498a4-b9be-4d46-84be-6312e21d1310",
+                                        "target": "50f6820b-5e55-4d43-9b13-614196d858ae"
+                                    },
+                                    {
+                                        "source": "22277abb-3b40-45a1-81e2-bb9e0b84f853",
+                                        "target": "892ab852-7fb8-4347-8738-15fa8d458144"
+                                    },
+                                    {
+                                        "source": "fd0cfd0a-cf5e-46a7-9814-c26d0a20e740",
+                                        "target": "866bc154-7aa3-46de-b6c9-0d88c84a9aed"
+                                    },
+                                    {
+                                        "source": "db87d799-af09-4e61-a8a7-454c1388a948",
+                                        "target": "8555a4ae-6a64-42f3-a849-79305b43a555"
+                                    },
+                                    {
+                                        "source": "acf3badf-5d0c-4176-ba4e-3039d480ae4b",
+                                        "target": "fcec109f-dc3c-4acb-9a8f-17f51a061117"
+                                    }
+                                ]
+                            }
+                        ],
+                        "invalidMappings": []
+                    }
+                }
+            }
+        },
+        "workflowtrigger1": {
+            "component": "com.sap.dh.trigger",
+            "metadata": {
+                "label": "Workflow Trigger",
+                "x": 12,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "workflowterminator1": {
+            "component": "com.sap.dh.terminator",
+            "metadata": {
+                "label": "Workflow Terminator",
+                "x": 550.9999980926514,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "pipeline1": {
+            "component": "com.sap.dh.vflowpipeline",
+            "metadata": {
+                "label": "Pipeline",
+                "x": 181,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "graphName": "teched.dat361.review_extraction"
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "489.9999990463257,43 517.9999985694885,43 517.9999985694885,52 545.9999980926514,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "datatransform1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "workflowterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "136,52 176,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "workflowtrigger1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "pipeline1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "305,43 332.99999952316284,43 332.99999952316284,52 360.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "pipeline1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "datatransform1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

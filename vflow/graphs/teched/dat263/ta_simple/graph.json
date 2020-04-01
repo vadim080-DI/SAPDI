@@ -1,0 +1,257 @@
+{
+    "properties": {},
+    "iconsrc": "",
+    "icon": "file-text-o",
+    "description": "TA HDFS 1 time",
+    "processes": {
+        "experimentaltextanalysistaconnector1": {
+            "component": "com.sap.textanalysis.taconnector",
+            "metadata": {
+                "label": "Text Analysis",
+                "x": 438.9999952316284,
+                "y": 11.500000238418579,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "CmdLine": "/project/textanalysis/bin/v2textanalysis_vflow",
+                    "TraceStderr": true,
+                    "Env": []
+                }
+            }
+        },
+        "javascriptoperator3": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "TA Response Parser",
+                "x": 598.9999942779541,
+                "y": 17.50000023841858,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var reqarray = s.split(\"\\n\");\n    var request = JSON.parse(reqarray[0]);\n    var response = reqarray[1];\n    if (response)\n    {\n        console.log(response);\n        if (response > 0)\n        {\n            var olddoc_ids = reqarray[2].split(\",\");\n            olddoc_ids.splice(0,1);\n            console.log( \"TA Response Parser:\\n\" + request.folderpath + \",\" + request.recursive_flag + \",\" + request.taconfig + \"\\n\" + olddoc_ids + \"\\n\");\n            $.output( request.folderpath + \",\" + request.recursive_flag + \",\" + request.taconfig + \",\" + request.createschema + \"\\n\" + olddoc_ids );\n        }\n        console.log(\"Number of Tokenized documents: \" + response);\n    }\n    else\n    {\n        console.log(response);\n        console.log(\"TA Response Parser:\\nTextanalysis server at '\" + request.endpoint +\"' is down or could not process the request.\");\n        $.fail(\"Text analysis server at '\" + request.endpoint +\"' is down or could not process the request.\");\n    }\n    \n}"
+                }
+            }
+        },
+        "javascriptoperator6": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "SQL Creator",
+                "x": 757.9999933242798,
+                "y": 18,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var schemaname = \"DAT263.\";\r\nvar foldercount = {};\r\nvar folders = [];\r\nvar tablenamesuffix = \"\";\r\nvar tatablename = \"TA_reviews\";\r\nvar tadoctablename = \"TADOC_reviews\";\r\nvar datasources = {};\r\nvar ds_counter = 1;\r\nvar root = false;\r\nvar columns = \"\";\r\nvar createindexflag = $.config.getBool(\"createindex\");\r\n\r\n$.setPortCallback(\"input\",onIn1);\r\n$.setPortCallback(\"input2\",onIn2);\r\n\r\nfunction onIn1(ctx,s) {\r\n\tvar reqarray=s.split(\"\\n\");\r\n    var request=reqarray[0].split(\",\");\r\n    var folderpath = request[0];\r\n\tvar recursive = request[1];\r\n\tvar taconfig = request[2];\r\n\tvar createschema = request[3];\r\n\tvar sqloutput = \"\";\r\n    var altertablesql = \"\";\r\n    var ds_ta;\r\n    var ds_tadoc;\r\n\r\n    ds_ta =\t\"dsreviews_TA\";\r\n\tds_tadoc = \"dsreviews_TADOC\";\r\n\taltertablesql += \"ALTER TABLE \" + schemaname + tatablename + \" DROP DATASOURCE ALL;\";\r\n\taltertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \" DROP DATASOURCE ALL;\";\r\n\t\t\r\n\taltertablesql += \"ALTER TABLE \" + schemaname + tatablename + \" ADD DATASOURCE AS \" + ds_ta +\" hdfs('hdfs://xsahana.sap.com:8020/DAT263/reviews/reviews_TA.csv') DELIMITED BY ',' skip 1;\";\r\n\taltertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \" ADD DATASOURCE AS \" + ds_tadoc +\" hdfs('hdfs://xsahana.sap.com:8020/DAT263/reviews/reviews_TADOC.csv') DELIMITED BY ',' skip 1;\";\r\n\r\n    altertablesql += \"LOAD TABLE \" + schemaname + tatablename + \";\";\r\n\taltertablesql += \"LOAD TABLE \" + schemaname + tadoctablename + \";\";\r\n\t\r\n    $.output(altertablesql);\r\n}\r\n\r\nfunction onIn2 (ctx,s)\r\n{\r\n\tvar inputarr = s.split(\"\\n\");\r\n\tvar ta_csv;\r\n\tvar tadoc_csv;\r\n\tvar i;\r\n\tif (inputarr[0] == \"init\")\r\n\t{\r\n\t    var dbinfo = inputarr[1].split(\",\");\r\n\t\tschemaname = dbinfo[0];\r\n\t\ttablenamesuffix = dbinfo[1];\r\n\t\ttatablename = \"TA_\" + tablenamesuffix;\r\n\t\ttadoctablename = \"TADOC_\" + tablenamesuffix;\r\n\t\tfolders = inputarr[2].split(\",\");\r\n\t\t\r\n\t\tfor (i=0;i<folders.length; i++)\r\n\t\t{\r\n\t\t\tta_csv = getcsvfilename(folders[i]) + \"_TA.csv\";\r\n\t\t\ttadoc_csv = getcsvfilename(folders[i]) + \"_TADOC.csv\";\r\n\t\t\tdatasources[ta_csv] = ds_counter++;\r\n\t\t\tdatasources[tadoc_csv] = ds_counter++;\r\n\t\t}\r\n\t}\r\n\telse if (inputarr[0] == \"update\")\r\n\t{\r\n\t    var newfolders = inputarr[1].split(\",\");\r\n\t    for (i=0;i<newfolders.length;i++)\r\n\t    {\r\n\t        folders.push(newfolders[i]);\r\n\t        ta_csv = getcsvfilename(newfolders[i]) + \"_TA.csv\";\r\n\t\t\ttadoc_csv = getcsvfilename(newfolders[i]) + \"_TADOC.csv\";\r\n\t\t\tdatasources[ta_csv] = ds_counter++;\r\n\t\t\tdatasources[tadoc_csv] = ds_counter++;\r\n\t    }\r\n\t}\r\n\telse if (inputarr[0] == \"delete\")\r\n\t{\r\n\t\tfolders = inputarr[1].split(\",\");\r\n\t\tvar deletedfolders = inputarr;\r\n\t\tvar droptads_sql = \"ALTER TABLE \" + schemaname + tatablename + \" DROP DATASOURCE \";\r\n\t\tvar droptadocds_sql = \"ALTER TABLE \" + schemaname + tadoctablename + \" DROP DATASOURCE \";\r\n\t\tvar sqloutput = \"\";\r\n\t\tfor (i=2;i<deletedfolders.length-1;i++)\r\n\t\t{\r\n\t\t\tta_csv = getcsvfilename(deletedfolders[i]) + \"_TA.csv\";\r\n\t\t\ttadoc_csv = getcsvfilename(deletedfolders[i]) + \"_TADOC.csv\";\r\n\t\t\tsqloutput += droptads_sql + \"ds\" + datasources[ta_csv] + \";\";\r\n\t\t\tsqloutput += droptadocds_sql + \"ds\" + datasources[tadoc_csv] + \";\";\r\n\t\t\tdelete datasources[ta_csv];\r\n\t\t\tdelete datasources[tadoc_csv];\r\n\t\t}\r\n\t\t\r\n\t    var droptadsmem_sql = \"ALTER TABLE \" + schemaname + tatablename + \"_mem DROP DATASOURCE ALL;\";\r\n\t\tdroptadsmem_sql += \"ALTER TABLE \" + schemaname + tadoctablename + \"_mem DROP DATASOURCE ALL;\";\r\n\t\tsqloutput += droptadsmem_sql;\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tatablename + \"_mem;\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tadoctablename + \"_mem;\";\r\n\t\tvar altertablesql = \"\";\r\n\t\tvar j;\r\n\t    for (j=0;j<folders.length;j++)\r\n    \t{\r\n\t    altertablesql += \"ALTER TABLE \" + schemaname + tatablename + \"_mem ADD DATASOURCE hdfs('\" + getcsvfilename(folders[j]) + \"_TA.csv') DELIMITED BY ',' skip 1;\";\r\n\t    altertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \"_mem ADD DATASOURCE hdfs('\" + getcsvfilename(folders[j]) + \"_TADOC.csv') DELIMITED BY ',' skip 1;\";\r\n    \t}\r\n    \tsqloutput += altertablesql;\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tatablename + \";\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tadoctablename + \";\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tatablename + \"_mem;\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tadoctablename + \"_mem;\";\r\n\t\t$.output(sqloutput);\r\n\t}\r\n}\r\n\r\nfunction getcsvfilename (folderpath)\r\n{\r\n\tvar foldername = folderpath.slice(folderpath.lastIndexOf(\"/\"), folderpath.length);\r\n\treturn folderpath + foldername; \r\n}\r\n\r\nfunction getsubfolderscsv (folderpath)\r\n{\r\n\tvar i;\r\n\tvar output = [];\r\n\tfor (i=0;i<folders.length;i++)\r\n\t{\r\n\t\tif (folders[i].indexOf(folderpath) !== -1)\r\n\t\t{\r\n\t\t\toutput.push(getcsvfilename(folders[i]));\r\n\t\t}\r\n\t}\r\n\treturn output;\r\n}",
+                    "createindex": false
+                },
+                "additionalinports": [
+                    {
+                        "name": "input2",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "recursive": true,
+                    "onlyReadOnChange": true,
+                    "path": "/DAT263/reviews/",
+                    "service": "webhdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    }
+                }
+            }
+        },
+        "tostringconverter1": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 158.99999904632568,
+                "y": 18,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "sapvoraclient2": {
+            "component": "com.sap.vora.client2",
+            "metadata": {
+                "label": "SAP Vora Client",
+                "x": 929.9999933242798,
+                "y": 18,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "vora-tx-coordinator",
+                            "password": "Voravora23!",
+                            "port": 10002,
+                            "tenant": "sap",
+                            "user": "vora",
+                            "useTLS": false
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "VORA"
+                    }
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1099,
+                "y": 18,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "javascriptoperator7": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "TA Request Generator",
+                "x": 246,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var serverendpoints = $.config.getString(\"serverendpoints\");\nvar taconfig = $.config.getString(\"taconfig\");\nvar serverendpointsarr = serverendpoints.split(\",\");\nvar languages = $.config.getString(\"languages\");\nvar mime_type = $.config.getString(\"mimetype\");\nvar encoding = $.config.getString(\"encoding\");\nvar maxdoc_id = -1;\nvar count = 1\n$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var fullpath = \"hdfs://xsahana.sap.com:8020/DAT263/reviews/\" ;\n\n    var randomendpoint = \"vora-textanalysis.vora23:10002\";\n    var tareq = {};   \n//    var request = s.split(\",\");\n    if( fullpath != \"hdfs://xsahana.sap.com:8020/DAT263/reviews/reviews_TA.csv\" && fullpath != \"hdfs://xsahana.sap.com:8020/DAT263/reviews/reviews_TADOC.csv\")\n    {\n        tareq.folderpath = fullpath;\n        tareq.recursive_flag = false;\n        maxdoc_id = count;\n        tareq.document_id = maxdoc_id;\n\n        tareq.createschema = false;\n        tareq.endpoint = randomendpoint;\n        tareq.taconfig = \"EXTRACTION_CORE_VOICEOFCUSTOMER\";\n        var serializedreq = JSON.stringify(tareq);\n        console.log(\"TA Request Creator:\\n\" + serializedreq+ \"\\n\");\n        $.output(serializedreq);\n    }\n}"
+                },
+                "additionaloutports": [
+                    {
+                        "name": "output2",
+                        "type": "string"
+                    }
+                ]
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "722.9999942779541,57.50000023841858 738,57.5 738,49 752.9999933242798,49"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator3"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator6"
+            }
+        },
+        {
+            "metadata": {
+                "points": "562.9999952316284,60.50000023841858 578.5,60.5 578.5,57.5 593.9999942779541,57.50000023841858"
+            },
+            "src": {
+                "port": "outFolderPath",
+                "process": "experimentaltextanalysistaconnector1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,43 147.5,43 147.5,34 153.99999904632568,34"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "881.9999933242798,58 924.9999933242798,58"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator6"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "sapvoraclient2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1053.9999933242798,58 1094,58"
+            },
+            "src": {
+                "port": "result",
+                "process": "sapvoraclient2"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "212.99999904632568,43 227,43 227,52 241,52"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator7"
+            }
+        },
+        {
+            "metadata": {
+                "points": "370,43 402,43 402,60.5 433.9999952316284,60.50000023841858"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator7"
+            },
+            "tgt": {
+                "port": "inFolderPath",
+                "process": "experimentaltextanalysistaconnector1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

@@ -1,0 +1,109 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Product Recommendations",
+    "description": "Product Recommendations."
+  },
+  "host": "sapdatahub.com",
+  "basePath": "/recsys",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/recs/{uid}": {
+      "get": {
+        "description": "Returns recommendations for given user id",
+        "operationId": "recs",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "description": "ID of user",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "num",
+            "in": "query",
+            "description": "Number of recommendations",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "recommendation response",
+            "schema": {
+              "$ref": "#/definitions/Recommendations"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Recommendations": {
+      "type": "object",
+      "required": [
+        "uid",
+        "items"
+      ],
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "iid",
+              "weight"
+            ],
+            "properties": {
+              "iid": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ErrorModel": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

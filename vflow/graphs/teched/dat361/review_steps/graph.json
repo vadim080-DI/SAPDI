@@ -1,0 +1,113 @@
+{
+    "properties": {},
+    "description": "Copy of Review Extraction and Ingestion",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "webhdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    },
+                    "path": "/DAT263/reviews/",
+                    "pattern": ".*txt",
+                    "pollPeriodInMs": "10000",
+                    "awsConnection": {
+                        "connectionProperties": {
+                            "accessKey": "AWSAccessKeyId",
+                            "awsProxy": "",
+                            "endpoint": "",
+                            "protocol": "HTTPS",
+                            "region": "eu-central-1",
+                            "rootPath": "",
+                            "secretKey": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "S3"
+                    },
+                    "awsBucket": "bucket1",
+                    "recursive": true,
+                    "onlyReadOnChange": true,
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 201.99999904632568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 201.99999904632568,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "141,103 168.99999952316284,103 168.99999952316284,52 196.99999904632568,52"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,121 168.99999952316284,121 168.99999952316284,172 196.99999904632568,172"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

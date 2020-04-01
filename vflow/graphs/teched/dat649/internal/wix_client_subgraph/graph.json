@@ -1,0 +1,184 @@
+{
+    "properties": {},
+    "description": "Wix Client Subgraph",
+    "processes": {
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 257.99999809265137,
+                "y": 134.49999952316284,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "blankjavascriptoperator5": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Request / Response",
+                "x": 442.99999713897705,
+                "y": 100.49999952316284,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "group_id": "${groupid}",
+                    "state": "${state}",
+                    "script": "$.setPortCallback(\"input\",onInput);\r\n$.setPortCallback(\"response\",onResponse);\r\n\r\nfunction isByteArray(data) {\r\n    return (typeof data === 'object' && Array.isArray(data) \r\n        && data.length > 0 && typeof data[0] === 'number')\r\n}\r\n\r\nfunction onInput(ctx,input) {\r\n    \r\n    var groupID = $.config.getString(\"group_id\");\r\n    var state = $.config.getString(\"state\");\r\n    var resultMD5 = input;\r\n\r\n    var body = {\r\n        \"groupID\": groupID\r\n    };\r\n\r\n    var msg = {};\r\n    msg.Attributes = {};\r\n\r\n    if ( state === 'Just Started' || state === \"1\" ) {\r\n        body.progress = \"1\";\r\n    } else if ( state === 'Moving Forward' || state === \"2\" ) {\r\n        body.progress = \"2\";\r\n    } else if ( state === 'Completed' || state === \"3\") {\r\n        body.progress = \"3\";\r\n        body.resultMD5 = resultMD5;\r\n    } else {\r\n        body.progress = \"1\";\r\n        //$.fail( \"State \" + state + \" is unknown.\" );\r\n    }\r\n    \r\n    msg.Body = JSON.stringify(body);\r\n    \r\n    msg.Attributes[\"openapi.consumes\"] = \"application/json\";\r\n    msg.Attributes[\"openapi.produces\"] = \"application/json\";\r\n    msg.Attributes[\"openapi.method\"] = \"POST\";\r\n    msg.Attributes[\"openapi.path_pattern\"] = \"/sendResult\";\r\n  \r\n    msg.Attributes[\"message.request.id\"] = \"state=\" + state;\r\n    \r\n    $.request(msg);\r\n}\r\n\r\nfunction onResponse(ctx,input) {\r\n    // convert the body into string if it is bytes\r\n    inbody = input.Body\r\n    if (isByteArray(inbody)) {\r\n        inbody = String.fromCharCode.apply(null, inbody);\r\n    }\r\n    result = JSON.stringify(input.Attributes) + inbody;\r\n    $.output(result);\r\n}\r\n\r\n"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "string"
+                    },
+                    {
+                        "name": "response",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "request",
+                        "type": "message"
+                    },
+                    {
+                        "name": "output",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "openapiclient1": {
+            "component": "com.sap.openapi.client",
+            "metadata": {
+                "label": "OpenAPI Client",
+                "x": 72.99999904632568,
+                "y": 99.99999952316284,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {
+                    "host": "puntispalazzolo.wixsite.com",
+                    "schemes": "https",
+                    "basePath": "/sdhteched2018/_functions"
+                }
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 627.9999961853027,
+                "y": 39.99999952316284,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap3": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 627.9999961853027,
+                "y": 159.99999952316284,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "196.99999904632568,139.99999952316284 224.99999856948853,139.99999952316284 224.99999856948853,174.49999952316284 252.99999809265137,174.49999952316284"
+            },
+            "src": {
+                "port": "out",
+                "process": "openapiclient1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "381.99999809265137,174.49999952316284 409.9999976158142,174.49999952316284 409.9999976158142,149.49999952316284 437.99999713897705,149.49999952316284"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "response",
+                "process": "blankjavascriptoperator5"
+            }
+        },
+        {
+            "metadata": {
+                "points": "566.999997138977,131.49999952316284 594.9999966621399,131.49999952316284 594.9999966621399,79.99999952316284 622.9999961853027,79.99999952316284"
+            },
+            "src": {
+                "port": "request",
+                "process": "blankjavascriptoperator5"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "751.9999961853027,79.99999952316284 779.9999957084656,79.99999952316284 779.9999957084656,12 594.9999966621399,12 594.9999966621399,71.5 409.9999976158142,71.5 409.9999976158142,37.5 224.99999856948853,37.5 224.99999856948853,72 12,72 12,139.99999952316284 67.99999904632568,139.99999952316284"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "openapiclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "566.999997138977,149.49999952316284 594.9999966621399,149.49999952316284 594.9999966621399,199.99999952316284 622.9999961853027,199.99999952316284"
+            },
+            "src": {
+                "port": "output",
+                "process": "blankjavascriptoperator5"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap3"
+            }
+        }
+    ],
+    "inports": {
+        "input": {
+            "port": "input",
+            "process": "blankjavascriptoperator5",
+            "metadata": {
+                "x": 349.99999809265137,
+                "y": 66.49999952316284,
+                "points": "377.99999809265137,80.49999952316284 409.9999976158142,80.49999952316284 409.9999976158142,131.49999952316284 437.99999713897705,131.49999952316284"
+            }
+        }
+    },
+    "outports": {
+        "output": {
+            "port": "out",
+            "process": "wiretap3",
+            "metadata": {
+                "x": 807.9999952316284,
+                "y": 111.99999976158142,
+                "points": "732.9999961853027,199.99999952316284 780,200 780,126 821.9999952316284,125.99999976158142"
+            }
+        }
+    }
+}

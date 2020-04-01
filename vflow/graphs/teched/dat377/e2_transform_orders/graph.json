@@ -1,0 +1,154 @@
+{
+    "properties": {},
+    "description": "[DAT377] Export Orders",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 181,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "terminateOnError": true,
+                    "recursive": true,
+                    "path": "",
+                    "onlyReadOnChange": true,
+                    "service": "S3",
+                    "awsConnection": {
+                        "connectionProperties": {
+                            "accessKey": "AWSAccessKeyId",
+                            "awsProxy": "",
+                            "endpoint": "",
+                            "protocol": "HTTPS",
+                            "region": "eu-central-1",
+                            "rootPath": "",
+                            "secretKey": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "S3"
+                    },
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "messagefilter1": {
+            "component": "com.sap.datatools.message_filter",
+            "metadata": {
+                "label": "Message Filter",
+                "x": 534.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "condition": {
+                        "daterange.last": true,
+                        "storage.endOfSequence": true
+                    }
+                }
+            }
+        },
+        "datetimerange1": {
+            "component": "com.sap.datatools.daterange",
+            "metadata": {
+                "label": "Datetime Range",
+                "x": 12,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": false,
+                "config": {
+                    "outstring": "/DAT377/${USER}/inbox/<DATE>/",
+                    "rangeconfig": {
+                        "date_from": "2019-01-01",
+                        "date_to": "2019-01-05",
+                        "delta": "1d"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 703.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 365.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "658.9999990463257,52 698.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagefilter1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "136,52 176,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "datetimerange1"
+            },
+            "tgt": {
+                "port": "inPath",
+                "process": "readfile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "305,61 332.99999952316284,61 332.99999952316284,52 360.9999990463257,52"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "489.9999990463257,52 529.9999990463257,52"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagefilter1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

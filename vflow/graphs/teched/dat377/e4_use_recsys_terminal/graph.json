@@ -1,0 +1,24 @@
+{
+    "properties": {},
+    "description": "[DAT377] Use RecSys Terminal",
+    "processes": {
+        "collaborativefilteringmodel1": {
+            "component": "com.sap.ariba.recsys_collabfilter1",
+            "metadata": {
+                "label": "Collaborative Filtering Model",
+                "x": 217.99999904632568,
+                "y": 39.99999952316284,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "rating_range": "1,2"
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [],
+    "inports": {},
+    "outports": {}
+}

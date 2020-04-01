@@ -1,0 +1,269 @@
+{
+    "properties": {},
+    "iconsrc": "../Twitter.png",
+    "description": "Twittter Sentiment Analysis",
+    "processes": {
+        "tostringconverter3": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 1022.9999957084656,
+                "y": 334,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "histogram1": {
+            "component": "com.sap.util.histogram",
+            "metadata": {
+                "label": "Histogram",
+                "x": 847.9999966621399,
+                "y": 317,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "nBins": 5,
+                    "rangeMin": -1
+                }
+            }
+        },
+        "histogramplotter1": {
+            "component": "com.sap.util.histogramPlotter",
+            "metadata": {
+                "label": "Histogram Plotter",
+                "x": 1125.999994277954,
+                "y": 317,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "messageoperator1": {
+            "component": "com.sap.system.jsmengine",
+            "metadata": {
+                "label": "Format Sentiment",
+                "x": 620,
+                "y": 168,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "// ---- Mahesh -----\r\n// A custom java script to stringify the data from the input port to adjust with \",\"\r\n// Unlike the other js operator, here we will only pickup polarity, date and the sentiment category to ingest into SAP HANA db.\r\n// Add custom sentiments like Postive, Strong, Negative, and Strong Negative ----\r\n$.setPortCallback(\"input\", onInput);\r\n\r\n//The input 's' is a string that contains comma seprated values of score, created date, text from tweet, component \r\n//ex - '.2,01/01/2019,velotics battery is great, battery'\r\nfunction onInput(ctx, message) {\r\n    \r\n    var i = -1\r\n    var foundComponent='';\r\n    var previousi = 1000;\r\n    words = ['Battery','Seat','Brake','Light']\r\n    \r\n    for (var word in words){\r\n      i=message.Body.toUpperCase().indexOf(words[word].toUpperCase());\r\n       \r\n      if (i<previousi && i>-1){\r\n                previousi=i\r\n                foundComponent = words[word]\r\n      }\r\n    }\r\n\r\n    var polarity = message.Attributes.polarity;    //creates an array from the text\r\n\r\n    switch (true) {\r\n        case (polarity > 0 && polarity <= 0.3):\r\n            sentiment = 'Positive Sentiment';\r\n            break;\r\n        case (polarity > 0.3 && polarity <= 1.5):\r\n            sentiment = 'Strong Positive Sentiment';\r\n            break;\r\n        case (polarity < 0 && polarity >= -0.5):\r\n            sentiment = 'Negative Sentiment';\r\n            break;\r\n        case (polarity < -0.5 && polarity >= -0.8):\r\n            sentiment = 'Strong Negative Sentiment';\r\n            break;\r\n        default:\r\n            if(Number(polarity) === Number(0)){\r\n                sentiment = 'Neutral Sentiment';\r\n            }else{\r\n                sentiment = 'Uncategorised Sentiment';\r\n            }\r\n    }\r\n    \r\n    var msg = {};\r\n    msg.Body = polarity + '^'+ sentiment+ '^'  + message.Attributes.created_at+'^'+ foundComponent+'^'+message.Body\r\n    $.output(msg);\r\n    $.polarityPort(polarity);\r\n\r\n}"
+                },
+                "additionaloutports": [
+                    {
+                        "name": "polarityPort",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 809,
+                "y": 168,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "saphanaclient2": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "Load into HANA",
+                "x": 1027.9999961853027,
+                "y": 168,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "additionalHosts": [],
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "useTLS": false,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    },
+                    "tableName": "\"DATAHUB_1\".\"TWEETANALYZER\"",
+                    "tableColumns": [
+                        {
+                            "name": "SCORE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "SENTIMENT",
+                            "type": "VARCHAR",
+                            "size": 5000
+                        },
+                        {
+                            "name": "CRDATE",
+                            "type": "VARCHAR",
+                            "size": 5000
+                        },
+                        {
+                            "name": "BIKE_COMPONENT",
+                            "type": "VARCHAR",
+                            "size": 5000
+                        },
+                        {
+                            "name": "TWEET_TEXT",
+                            "type": "VARCHAR",
+                            "size": 5000
+                        }
+                    ],
+                    "initTable": "None",
+                    "csvComma": "^"
+                }
+            }
+        },
+        "sentimentanalyser1": {
+            "component": "com.sap.ml.nlp.sentimentAnalyser",
+            "metadata": {
+                "label": "Sentiment Analyser",
+                "x": 413.9999990463257,
+                "y": 168,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "try:\n    from textblob import TextBlob\nexcept:\n    raise ValueError(\"textblob library is not installed. Run 'pip install textblob' for installing it.\\n\")\n\n\ndef force_unicode(m):\n    try:\n        return unicode(m)\n    except UnicodeDecodeError:\n        ascii = str(m).encode('string_escape')\n        return unicode(ascii)\n\n\ndef on_input(message):\n    body = message.body\n    attributes = message.attributes\n    blob = TextBlob(force_unicode(body))\n    attributes[u'polarity'] = u\"%.3f\" % blob.polarity\n    attributes[u'subjectivity'] = u\"%.3f\" % blob.subjectivity\n    new_message = api.Message(body=body, attributes=attributes)\n    api.send(\"out\", new_message)\n\n\napi.set_port_callback(\"in\", on_input)"
+                }
+            }
+        },
+        "tweetstream1": {
+            "component": "com.sap.social.tweetStream",
+            "metadata": {
+                "label": "Tweet Stream",
+                "x": 219,
+                "y": 168,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "accessToken": "854394609853747204-yZMEOcifRMA7rf44pZcEFOx2O793Dhe",
+                    "accessTokenSecret": "K3GfLNHfbfNQd1crANK9VQCFJrJpKGzy1KZZwn75jZjub",
+                    "consumerKey": "T35U6AoOeEQLYssE0daAptInR",
+                    "consumerSecret": "gseiX1LnxTdl8Q1sRQPkYumA0vWLCQUsMUXRef5p6jnf4KG1aL",
+                    "filterWords": "velotics"
+                }
+            }
+        }
+    },
+    "groups": [
+        {
+            "name": "group8",
+            "nodes": [
+                "tostringconverter3",
+                "histogram1",
+                "histogramplotter1"
+            ],
+            "metadata": {
+                "description": "Frequency Distribution"
+            }
+        }
+    ],
+    "connections": [
+        {
+            "metadata": {
+                "points": "971.9999966621399,357 995,357 995,368 1017.9999957084656,368"
+            },
+            "src": {
+                "port": "histOut",
+                "process": "histogram1"
+            },
+            "tgt": {
+                "port": "inmessage",
+                "process": "tostringconverter3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1076.9999957084656,359 1094,359 1094,351 1110.999994277954,351"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter3"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "histogramplotter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "744,199 774,199 774,208 804,208"
+            },
+            "src": {
+                "port": "output",
+                "process": "messageoperator1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "744,217 793.5,217 793.5,357 842.9999966621399,357"
+            },
+            "src": {
+                "port": "polarityPort",
+                "process": "messageoperator1"
+            },
+            "tgt": {
+                "port": "histIn",
+                "process": "histogram1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "343,199 376,199 376,208 408.9999990463257,208"
+            },
+            "src": {
+                "port": "outTweet",
+                "process": "tweetstream1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "sentimentanalyser1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "537.9999990463257,208 615,208"
+            },
+            "src": {
+                "port": "out",
+                "process": "sentimentanalyser1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messageoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "933,208 978,208 978,217 1022.9999961853027,217"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "data",
+                "process": "saphanaclient2"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

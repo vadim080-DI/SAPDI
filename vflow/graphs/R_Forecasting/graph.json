@@ -1,0 +1,646 @@
+{
+    "properties": {},
+    "description": "SAP Data Hub and R: Time series forecasting",
+    "processes": {
+        "rclient2": {
+            "component": "com.sap.system.rClient",
+            "metadata": {
+                "label": "R Client",
+                "x": 985.9999914169312,
+                "y": 296.4999997615814,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "api$setPortCallback(c(\"input\"), c(\"output\"), \"dh_forecast\")\r\n\r\ndh_forecast <- function(data) {\r\ndata <- fromJSON(data)\r\nresult <- forecast_monthly(data)\r\nresult <- toJSON(result, na = 'null')\r\nlist(output=result) \r\n}\r\n\r\nforecast_monthly <- function(data){\r\n  # Load required libraries ---------------------------------------------------------\r\n  library(lubridate)\r\n  library(forecast)\r\n  library(MLmetrics)\r\n\r\n  # Specify any parameters, adjust to the use case ----------------------------------\r\n  col_name_date     <- \"MONTH\"   \r\n  col_name_measure  <- \"REGISTRATIONS\"\r\n  col_name_segment  <- \"COUNTRY\"\r\n  date_format       <- \"%Y-%m-%d\"\r\n  dates_to_forecast <- 12 \r\n  confidence_level  <- 0.95\r\n  forecast_methods  <- c('arima', 'ets', 'rwdrift', 'naive') \r\n  frequency         <- 12 # This value must not be changed\r\n  \r\n  # Retrieve the individual columns from the data frame -----------------------------\r\n  col_date    <- as.character(data[, col_name_date])\r\n  col_measure <- data[, col_name_measure]\r\n  col_segment <- data[1, col_name_segment]\r\n  \r\n  # Print status update -------------------------------------------------------------\r\n  print(paste(\"Now starting with: \", col_segment, sep = \"\"))\r\n  \r\n  # Ensure data is sorted on the date in ascending order  ---------------------------\r\n  data <- data [order(data[, col_name_date]), ] \r\n  \r\n  # Convert time series into ts object (required by forecast function) --------------\r\n  start_date  <- as.Date(data[1, col_name_date], date_format)\r\n  ts_historic <- ts(data[, col_name_measure], \r\n                    start = c(year(start_date), month(start_date)),\r\n                    frequency = frequency)\r\n  \r\n  # Keep a hold out sample of forecast length to test forecast accuracy -------------\r\n  ts_short      <- head(ts_historic, n = length(ts_historic)-dates_to_forecast)\r\n  ts_hold_out   <- tail(ts_historic, n = dates_to_forecast)\r\n  \r\n  # Assess all forecasting methods on their performance on the hold out sample ------\r\n  ts_short_mapes <- rep(NA, length(forecast_methods))\r\n  for (ii in 1:length(forecast_methods)) {\r\n    stlf_forecast <- stlf(ts_short, \r\n                          method = forecast_methods[ii], \r\n                          h = dates_to_forecast, \r\n                          level = confidence_level)\r\n    ts_short_mapes[ii] <- MAPE(as.numeric(ts_hold_out), stlf_forecast$mean)\r\n  }\r\n  \r\n  # Select the best performing method to carry out the final forecast ---------------\r\n  forecast_best_mape <- min(ts_short_mapes)\r\n  ts_forecast <- stlf(ts_historic, \r\n                      method = forecast_methods[which(ts_short_mapes == forecast_best_mape)], \r\n                      h = dates_to_forecast, \r\n                      level = confidence_level)\r\n  \r\n  # Dates, name of time series (segment) and date type (Actual or Forecast) ---------\r\n  dates_all    <- as.character(seq(from = start_date, by = \"month\",  length.out = length(ts_historic)+dates_to_forecast))\r\n  col_segments <- rep(col_segment, length(dates_all))\r\n  model_descr  <- rep(paste(ts_forecast$method, \"- MAPE:\",  round(forecast_best_mape, 3)), length(dates_all))\r\n  date_types   <- as.character(c(rep(\"Actual\", length(ts_historic)), rep(\"Forecast\", dates_to_forecast)))\r\n  \r\n  # Actual and historic measures ----------------------------------------------------\r\n  forecast_mean   <- rep(NA, dates_to_forecast)\r\n  forecast_mean   <- ts_forecast$mean\r\n  forecast_upper  <- ts_forecast$upper\r\n  forecast_lower  <- ts_forecast$lower\r\n  dates_all_mean  <- as.numeric(c(as.numeric(ts_historic), as.numeric(forecast_mean)))\r\n  dates_all_lower <- as.numeric(c(rep(NA, length(ts_historic)), as.numeric(forecast_lower)))\r\n  dates_all_upper <- as.numeric(c(rep(NA, length(ts_historic)), as.numeric(forecast_upper)))\r\n  \r\n  # Return the combined data --------------------------------------------------------\r\n  result <- data.frame(SEGMENT = col_segments,  \r\n                       MONTH = dates_all, \r\n                       MEASURETYPE = date_types, \r\n                       MEASURE = dates_all_mean, \r\n                       MEASURELOWER = dates_all_lower, \r\n                       MEASUREUPPER = dates_all_upper, \r\n                       MODEL = model_descr)\r\n  return(result)\r\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "string"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "saphanaclient1": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 201.99999904632568,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    }
+                }
+            }
+        },
+        "constantgenerator1": {
+            "component": "com.sap.util.constantGenerator",
+            "metadata": {
+                "label": "Constant Generator",
+                "x": 17,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "content": "SELECT DISTINCT COUNTRY FROM DEMO.VEHICLEREGISTRATIONS;"
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 370.9999990463257,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "toblobconverter1": {
+            "component": "com.sap.util.toBlobConverter",
+            "metadata": {
+                "label": "ToBlob Converter",
+                "x": 539.9999990463257,
+                "y": 87,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "formatconverter1": {
+            "component": "com.sap.util.formatConverter",
+            "metadata": {
+                "label": "Format Converter",
+                "x": 638.9999990463257,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "tostringconverter1": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 823.9999980926514,
+                "y": 87,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "blankjavascriptoperator1": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Blank JavaScript Operator",
+                "x": 1107.999997138977,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput)\r\n\r\nfunction onInput(ctx,s) {\r\n    var json = JSON.parse(s);\r\n    for(var ii = 0; ii < json.length; ii++) {\r\n        var country_name = json[ii].COUNTRY;\r\n        $.output(\"SELECT COUNTRY, MONTH, REGISTRATIONS FROM DEMO.VEHICLEREGISTRATIONS WHERE VEHICLEREGISTRATIONS.COUNTRY = '\" + country_name + \"' ORDER BY MONTH ASC;\")\r\n    }\r\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "string"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 1292.9999961853027,
+                "y": 86.49999976158142,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "saphanaclient2": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 196.99999523162842,
+                "y": 288.4999997615814,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    }
+                }
+            }
+        },
+        "wiretap3": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 365.9999952316284,
+                "y": 288.4999997615814,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "toblobconverter2": {
+            "component": "com.sap.util.toBlobConverter",
+            "metadata": {
+                "label": "ToBlob Converter",
+                "x": 550.9999942779541,
+                "y": 303.4999997615814,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "formatconverter2": {
+            "component": "com.sap.util.formatConverter",
+            "metadata": {
+                "label": "Format Converter",
+                "x": 665.9999933242798,
+                "y": 288.4999997615814,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "tostringconverter2": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 850.9999923706055,
+                "y": 303.4999997615814,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "wiretap4": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 1190.9999904632568,
+                "y": 288.4999997615814,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "saphanaclient3": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 1375.9999895095825,
+                "y": 288.4999997615814,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    },
+                    "inputFormat": "JSON",
+                    "tableName": "DEMO.VEHICLEREGISTRATIONS_FORECAST",
+                    "tableColumns": [
+                        {
+                            "name": "SEGMENT",
+                            "type": "NVARCHAR",
+                            "size": 14
+                        },
+                        {
+                            "name": "MONTH",
+                            "type": "DATE"
+                        },
+                        {
+                            "name": "MEASURETYPE",
+                            "type": "NVARCHAR",
+                            "size": 20
+                        },
+                        {
+                            "name": "MEASURE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "MEASURELOWER",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "MEASUREUPPER",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "MODEL",
+                            "type": "NVARCHAR",
+                            "size": 107
+                        }
+                    ]
+                }
+            }
+        },
+        "12multiplexer1": {
+            "component": "com.sap.system.multiplexer.1-2",
+            "metadata": {
+                "label": "1:2 Multiplexer",
+                "x": 922.9999980926514,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "blankjavascriptoperator2": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Blank JavaScript Operator",
+                "x": 1107.999997138977,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput)\r\n\r\nfunction onInput(ctx,s) {\r\n    var json = JSON.parse(s);\r\n    $.output(json.length)\r\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "string"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "int64"
+                    }
+                ]
+            }
+        },
+        "blankjavascriptoperator3": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Blank JavaScript Operator",
+                "x": 1695.9999885559082,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"inputtarget\",onInputTarget)\r\n$.setPortCallback(\"inputcurrent\",onInputCurrent)\r\n\r\nvar target = -1\r\nvar current = 0\r\n\r\nfunction onInputTarget(ctx,s) {\r\n    target = s\r\n    if (current == target) {\r\n          $.output(\"DONE\")\r\n    }\r\n}\r\n\r\nfunction onInputCurrent(ctx,s) {\r\n    current++\r\n    if (current == target) {\r\n          $.output(\"DONE\")\r\n    }\r\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "inputtarget",
+                        "type": "int64"
+                    },
+                    {
+                        "name": "inputcurrent",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1862.9999885559082,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        }
+    },
+    "groups": [
+        {
+            "name": "group1",
+            "nodes": [
+                "rclient2"
+            ],
+            "metadata": {
+                "description": "Group"
+            },
+            "tags": {
+                "rserve": "",
+                "rjsonlite": "",
+                "rforecast": ""
+            }
+        }
+    ],
+    "connections": [
+        {
+            "metadata": {
+                "points": "141,112 168.99999952316284,112 168.99999952316284,103 196.99999904632568,103"
+            },
+            "src": {
+                "port": "out",
+                "process": "constantgenerator1"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "saphanaclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,112 365.9999990463257,112"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "494.9999990463257,112 534.9999990463257,112"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "toblobconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "593.9999990463257,112 633.9999990463257,112"
+            },
+            "src": {
+                "port": "outbytearray",
+                "process": "toblobconverter1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "formatconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "762.9999990463257,112 790.9999985694885,112 790.9999985694885,121 818.9999980926514,121"
+            },
+            "src": {
+                "port": "output",
+                "process": "formatconverter1"
+            },
+            "tgt": {
+                "port": "inmessage",
+                "process": "tostringconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1231.999997138977,172 1259.99999666214,172 1259.99999666214,126.49999976158142 1287.9999961853027,126.49999976158142"
+            },
+            "src": {
+                "port": "output",
+                "process": "blankjavascriptoperator1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1416.9999961853027,126.49999976158142 1467,126.5 1467,223 142,223 142,319.5 191.99999523162842,319.4999997615814"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "saphanaclient2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "320.9999952316284,328.4999997615814 360.9999952316284,328.4999997615814"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient2"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "489.9999952316284,328.4999997615814 545.9999942779541,328.4999997615814"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap3"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "toblobconverter2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "604.9999942779541,328.4999997615814 660.9999933242798,328.4999997615814"
+            },
+            "src": {
+                "port": "outbytearray",
+                "process": "toblobconverter2"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "formatconverter2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "789.9999933242798,328.4999997615814 817.9999928474426,328.4999997615814 817.9999928474426,337.4999997615814 845.9999923706055,337.4999997615814"
+            },
+            "src": {
+                "port": "output",
+                "process": "formatconverter2"
+            },
+            "tgt": {
+                "port": "inmessage",
+                "process": "tostringconverter2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "904.9999923706055,328.4999997615814 932.9999918937683,328.4999997615814 932.9999918937683,336.4999997615814 980.9999914169312,336.4999997615814"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter2"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "rclient2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1109.9999914169312,336.4999997615814 1157.999990940094,336.4999997615814 1157.999990940094,328.4999997615814 1185.9999904632568,328.4999997615814"
+            },
+            "src": {
+                "port": "output",
+                "process": "rclient2"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap4"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1314.9999904632568,328.4999997615814 1342.9999899864197,328.4999997615814 1342.9999899864197,337.4999997615814 1370.9999895095825,337.4999997615814"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap4"
+            },
+            "tgt": {
+                "port": "data",
+                "process": "saphanaclient3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "877.9999980926514,112 917.9999980926514,112"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "12multiplexer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1046.9999980926514,121 1074.9999976158142,121 1074.9999976158142,172 1102.999997138977,172"
+            },
+            "src": {
+                "port": "out2",
+                "process": "12multiplexer1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "blankjavascriptoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1046.9999980926514,103 1074.9999976158142,103 1074.9999976158142,52 1102.999997138977,52"
+            },
+            "src": {
+                "port": "out1",
+                "process": "12multiplexer1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "blankjavascriptoperator2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1231.999997138977,52 1461.5,52 1461.5,103 1690.9999885559082,103"
+            },
+            "src": {
+                "port": "output",
+                "process": "blankjavascriptoperator2"
+            },
+            "tgt": {
+                "port": "inputtarget",
+                "process": "blankjavascriptoperator3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1499.9999895095825,328.4999997615814 1595.5,328.5 1595.5,121 1690.9999885559082,121"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient3"
+            },
+            "tgt": {
+                "port": "inputcurrent",
+                "process": "blankjavascriptoperator3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1819.9999885559082,112 1857.9999885559082,112"
+            },
+            "src": {
+                "port": "output",
+                "process": "blankjavascriptoperator3"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

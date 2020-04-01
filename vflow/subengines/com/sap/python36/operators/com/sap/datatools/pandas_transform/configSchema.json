@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/com.sap.datatools.pandas_transform.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "in_format": {
+            "title": "Input Format",
+            "type": "string",
+            "enum": [
+                "",
+                "CSV",
+                "JSON",
+                "PARQUET"
+            ]
+        },
+        "out_format": {
+            "title": "Output Format",
+            "type": "string",
+            "enum": [
+                "",
+                "CSV",
+                "JSON",
+                "PARQUET"
+            ]
+        },
+        "in_properties": {
+            "title": "Input Properties",
+            "type": "object",
+            "properties": {}
+        },
+        "out_properties": {
+            "title": "Output Properties",
+            "type": "object",
+            "properties": {}
+        }
+    },
+    "required": []
+}

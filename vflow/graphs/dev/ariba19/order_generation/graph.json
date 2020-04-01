@@ -1,0 +1,180 @@
+{
+    "properties": {},
+    "description": "[Ariba19] Order Generation",
+    "processes": {
+        "python3operator1": {
+            "component": "com.sap.system.python3Operator",
+            "metadata": {
+                "label": "Python3 Operator",
+                "x": 201.99999904632568,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import time\nimport datetime\nimport re\nimport random\n\nn = 1000\nm = 5\norders = None\n\ndef parse_new_date(msg, default_last_date=\"2019-01-01\"):\n    fns = msg.body.split(\"\\n\")\n    n = len(fns)\n    parsed_dates = []\n    for i,fn in enumerate(fns):\n        last = True if i == n-1 else False\n        dates = re.findall(\"\\d{4}-\\d{2}-\\d{2}\", fn)\n        if dates:\n            parsed_dates.append(dates[-1])\n    last_date = default_last_date\n    if parsed_dates:\n        parsed_dates.sort()\n        last_date = parsed_dates[-1]\n    last_datetime = datetime.datetime.strptime(last_date, \"%Y-%m-%d\")\n    global new_date\n    new_date = datetime.datetime.strftime(last_datetime + datetime.timedelta(days=1), \"%Y-%m-%d\")\n    return new_date\n\ndef on_existingfiles(msg):\n    new_date = parse_new_date(msg, \"2019-01-01\")\n    wait_for_orders_ready()\n    \n    for i in range(m):\n        last = True if i == m-1 else False\n        neworders = random.choices(orders, k=n)\n        api.send(\"neworders\", api.Message(\"\\n\".join(neworders), {\"last\": last, \"orderdate\": new_date}))\n        \n    # block because of bug 111222 (read on change does not work)\n    while True:\n        time.sleep(10)\n    \ndef wait_for_orders_ready():\n    while orders == None:\n        time.sleep(0.5)\n    \ndef on_orders(msg):\n    global orders\n    orders = msg.body.decode(\"utf-8\", \"ignore\").split(\"\\n\")\n\napi.set_port_callback(\"existingfiles\", on_existingfiles)\napi.set_port_callback(\"orders\", on_orders)\n\n"
+                },
+                "additionalinports": [
+                    {
+                        "name": "existingfiles",
+                        "type": "message"
+                    },
+                    {
+                        "name": "orders",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "neworders",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/orders.csv"
+                }
+            }
+        },
+        "readfile2": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/inbox/",
+                    "onlyReadOnChange": true,
+                    "recursive": true,
+                    "batchRead": true,
+                    "service": "FILE",
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 370.9999990463257,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/inbox/\\${orderdate}/part-<counter>.csv",
+                    "mode": "create",
+                    "service": "FILE",
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "messagefilter1": {
+            "component": "com.sap.datatools.message_filter",
+            "metadata": {
+                "label": "Message Filter",
+                "x": 539.9999990463257,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "condition": {
+                        "last": true
+                    }
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 708.9999990463257,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "141,181 168.99999952316284,181 168.99999952316284,121 196.99999904632568,121"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "orders",
+                "process": "python3operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,43 168.99999952316284,43 168.99999952316284,103 196.99999904632568,103"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile2"
+            },
+            "tgt": {
+                "port": "existingfiles",
+                "process": "python3operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,112 365.9999990463257,112"
+            },
+            "src": {
+                "port": "neworders",
+                "process": "python3operator1"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "494.9999990463257,112 534.9999990463257,112"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagefilter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "663.9999990463257,112 703.9999990463257,112"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagefilter1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

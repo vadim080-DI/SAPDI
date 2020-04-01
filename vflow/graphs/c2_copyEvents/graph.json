@@ -1,0 +1,119 @@
+{
+    "properties": {},
+    "description": "c2_copyEvents",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 270,
+                "y": 126,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "webhdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "xsahana.sap.com",
+                            "port": 8020,
+                            "user": "hdfs",
+                            "protocol": "rpc"
+                        },
+                        "configurationType": "Manual",
+                        "connectionID": "HDFS"
+                    },
+                    "path": "/exercises/events.parquet",
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    }
+                }
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 489,
+                "y": 140,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "webhdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "xsahana.sap.com",
+                            "port": 8020,
+                            "user": "hdfs",
+                            "protocol": "rpc"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "path": "/exercises/solutions/EventsCopied.parquet",
+                    "mode": "overwrite",
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    }
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 747,
+                "y": 180,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "394,175 439.5,175 439.5,180 485,180"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "613,180 678,180 678,220 743,220"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

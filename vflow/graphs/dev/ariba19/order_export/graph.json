@@ -1,0 +1,263 @@
+{
+    "properties": {},
+    "description": "[Ariba19] Order Export",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 350,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "terminateOnError": true,
+                    "recursive": true,
+                    "path": "",
+                    "onlyReadOnChange": true
+                }
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 872.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "../ariba/export/orders-\\${daterange.value}.json",
+                    "mode": "overwrite"
+                }
+            }
+        },
+        "messagefilter1": {
+            "component": "com.sap.datatools.message_filter",
+            "metadata": {
+                "label": "Message Filter",
+                "x": 1041.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "condition": {
+                        "daterange.last": true
+                    }
+                }
+            }
+        },
+        "datetimerange1": {
+            "component": "com.sap.datatools.daterange",
+            "metadata": {
+                "label": "Datetime Range",
+                "x": 12,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "from operators.com.sap.datatools.daterange.daterange import daterange\n\n\ndef get_prop(name, default_value):\n    if hasattr(api.config, name) and getattr(api.config, name) != \"\":\n        return getattr(api.config, name)\n    return default_value\n\n\ndef gen():\n    props = get_prop(\"rangeconfig\", {\"date_from\": \"2019-01-01\", \"date_to\": \"2019-02-01\", \"delta\": \"2d\"})\n    outstring = get_prop(\"outstring\", \"<DATE>\")\n    dates = daterange(props[\"date_from\"], props[\"date_to\"], props[\"delta\"])\n    n = len(dates)\n    for i,dt in enumerate(dates):\n        last = True if i == n-1 else False\n        out = outstring.replace(\"<DATE>\", dt)\n        api.send(\"output\", api.Message(out, {\"daterange.last\": last, \"daterange.value\": dt}))\n\napi.add_generator(gen)\n",
+                    "outstring": "../ariba/inbox/<DATE>/",
+                    "rangeconfig": {
+                        "date_from": "2019-01-01",
+                        "date_to": "2019-01-04",
+                        "delta": "1d"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 1210.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 181,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1379.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "pandastransform1": {
+            "component": "com.sap.datatools.pandas_transform",
+            "metadata": {
+                "label": "Pandas Transform",
+                "x": 534.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "out_properties": {
+                        "header": true,
+                        "index": false
+                    },
+                    "in_properties": {
+                        "header": -1,
+                        "names": [
+                            "oid",
+                            "dt",
+                            "uid",
+                            "email",
+                            "pid",
+                            "amount",
+                            "cur",
+                            "price"
+                        ]
+                    }
+                }
+            }
+        },
+        "pandastransform2": {
+            "component": "com.sap.datatools.pandas_transform",
+            "metadata": {
+                "label": "Pandas Transform",
+                "x": 703.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "try:\n    api\nexcept Exception as e:\n    from pyop_api_mock import API\n    api = API()\n    api.config.encoding = \"utf-8\"\n    api.config.in_format = \"csv\"\n    api.config.out_format = \"csv\"\n    api.config.in_properties = {\"header\": -1}\n    api.config.out_properties = {}\n\n\n# ///////////////////////////////////////////////////////////\n\nimport pandas as pd\nimport numpy as np\n\ndef on_dataframe(df, ctx):\n    api.logger.info(df)\n    \n    records = df[ [\"uid\",\"pid\",\"amount\"] ].to_json(orient=\"values\")\n\n    api.send(\"output\", api.Message(records, ctx.msg.attributes))\n    ctx.done()\n\n# //////////////////////////////////////////////////////////\n\ndef get_prop(name, default_value):\n    if hasattr(api.config, name):\n        return getattr(api.config, name)\n    return default_value\n\nin_format = get_prop(\"in_format\", \"CSV\")\nout_format = get_prop(\"out_format\", \"CSV\")\nin_properties = get_prop(\"in_properties\", { \"header\": -1 })\nout_properties = get_prop(\"out_properties\", {})\n\nfrom operators.com.sap.datatools.util.pdutil import OpContext\nctx = OpContext(api,\n        on_dataframe,\n        \"output\",\n        in_format=in_format,\n        out_format=out_format,\n        in_properties=in_properties,\n        out_properties=out_properties)\n\ndef on_input(msg):\n    ctx.process(msg)\n\napi.set_port_callback(\"input\", on_input)\n\n\n# //////////////////////////////////////////////////////////\n\nif __name__ == \"__main__\" and hasattr(api, \"test\"):\n    test_csv = \"aaa,2019-01-01,3.3\\nbbb,2019-01-02,6\"\n    for i in range(100):\n        inmsg = api.Message(test_csv, {\"foo\": 1, \"idx\": i})\n        api.test.write(\"input\", inmsg)\n        outmsg = api.test.read(\"output\")\n        print(outmsg.attributes[\"idx\"])\n        print(outmsg.body)\n",
+                    "in_properties": {
+                        "header": 0
+                    }
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "996.9999990463257,52 1036.9999990463257,52"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagefilter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1165.9999990463257,52 1205.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagefilter1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "136,52 176,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "datetimerange1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "305,52 345,52"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "inPath",
+                "process": "readfile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1334.9999990463257,52 1374.9999990463257,52"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "474,61 501.99999952316284,61 501.99999952316284,52 529.9999990463257,52"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "pandastransform1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "658.9999990463257,52 698.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "pandastransform1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "pandastransform2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "827.9999990463257,52 867.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "pandastransform2"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

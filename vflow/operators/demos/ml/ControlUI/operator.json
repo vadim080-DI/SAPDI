@@ -1,0 +1,1 @@
+{"description":"Product Quality Control UI","component":"com.sap.system.webapp","icon":"window-restore","config":{"routes":[{"Path":"/","RoutingType":"static","Target":"web"},{"Path":"/socket","RoutingType":"websocket","Target":"1"},{"Path":"/flask/","RoutingType":"rproxy","Target":"http://localhost:9005/flask/"}]}}

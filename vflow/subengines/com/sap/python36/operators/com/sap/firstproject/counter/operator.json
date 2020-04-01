@@ -1,0 +1,21 @@
+{
+    "description": "Counter",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "input",
+            "type": "string"
+        }
+    ],
+    "outports": [
+        {
+            "name": "output",
+            "type": "int64"
+        }
+    ],
+    "icon": "puzzle-piece",
+    "config": {
+        "$type": "http://sap.com/vflow/com.sap.firstproject.counter.configSchema.json",
+        "script": "file://DI_git.py"
+    }
+}

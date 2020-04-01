@@ -1,0 +1,506 @@
+{
+    "properties": {},
+    "iconsrc": "../Brain.png",
+    "description": "Face Match Video Demo",
+    "processes": {
+        "12multiplexer1": {
+            "component": "com.sap.system.multiplexer.1-2",
+            "metadata": {
+                "label": "1:2 Multiplexer",
+                "x": 649,
+                "y": -394,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "13multiplexer1": {
+            "component": "com.sap.system.multiplexer.1-3",
+            "metadata": {
+                "label": "1:3 Multiplexer",
+                "x": 649,
+                "y": -181,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "readfiles2": {
+            "component": "experimental.core.io.readFiles",
+            "metadata": {
+                "label": "Read Files",
+                "x": 649,
+                "y": -31,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "sourcePath": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/pickle/data.pickle"
+                }
+            }
+        },
+        "loadpickle1": {
+            "component": "experimental.core.io.loadPickle",
+            "metadata": {
+                "label": "Load Pickle",
+                "x": 903,
+                "y": -31,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "iterate": true
+                }
+            }
+        },
+        "12multiplexer5": {
+            "component": "com.sap.system.multiplexer.1-2",
+            "metadata": {
+                "label": "1:2 Multiplexer",
+                "x": 1820,
+                "y": -191,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "facedetection2": {
+            "component": "experimental.ml.imageprocessing.detection.opencv.faceDetection",
+            "metadata": {
+                "label": "Face Detection",
+                "x": 215,
+                "y": -308,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "face_cascade_path": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/models/lbpcascade_frontalface.xml"
+                }
+            }
+        },
+        "capturevideo2": {
+            "component": "com.sap.cv.opencv.mediaio.captureVideo",
+            "metadata": {
+                "label": "Capture Video",
+                "x": -156,
+                "y": -308,
+                "height": 80,
+                "width": 120,
+                "extensible": false,
+                "config": {
+                    "fps": 30,
+                    "filePath": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/video/g20.mp4"
+                }
+            }
+        },
+        "framelimiter2": {
+            "component": "com.sap.cv.opencv.vidutil.frameLimiter",
+            "metadata": {
+                "label": "Frame Limiter",
+                "x": 33,
+                "y": -308,
+                "height": 80,
+                "width": 120,
+                "extensible": false,
+                "config": {
+                    "skip": 1
+                }
+            }
+        },
+        "faceembedding1": {
+            "component": "experimental.ml.imageprocessing.embedding.dlib.faceEmbedding",
+            "metadata": {
+                "label": "Face Embedding",
+                "x": 847,
+                "y": -294,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "face_rec_model_path": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/models/dlib_face_recognition_resnet_model_v1.dat",
+                    "predictor_path": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/models/shape_predictor_5_face_landmarks.dat"
+                }
+            }
+        },
+        "facematch1": {
+            "component": "experimental.ml.imageprocessing.faceMatch.faceMatch",
+            "metadata": {
+                "label": "Face Match",
+                "x": 1219,
+                "y": -191,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "motionjpgstream1": {
+            "component": "com.sap.cv.opencv.mediaio.mjpgStream",
+            "metadata": {
+                "label": "Motion JPG Stream",
+                "x": 2285,
+                "y": -303,
+                "height": 80,
+                "width": 120,
+                "extensible": false,
+                "config": {
+                    "port": 9010
+                }
+            }
+        },
+        "streamviewer1": {
+            "component": "com.sap.cv.util.streamViewer",
+            "metadata": {
+                "label": "Stream Viewer",
+                "x": 2285,
+                "y": -206,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "facedetectioninterpolation2": {
+            "component": "experimental.ml.imageprocessing.interpolations.faceDetectionInterpolation",
+            "metadata": {
+                "label": "Face Detection Interpolation",
+                "x": 435,
+                "y": -308,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "facematchinterpolation2": {
+            "component": "experimental.ml.imageprocessing.interpolations.faceMatchInterpolation",
+            "metadata": {
+                "label": "Face Match Interpolation",
+                "x": 1481,
+                "y": -286,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "drawrectangles1": {
+            "component": "experimental.ml.imageprocessing.util.drawRectangles",
+            "metadata": {
+                "label": "Draw Rectangles",
+                "x": 1816,
+                "y": -405,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "textonrectangles2": {
+            "component": "experimental.ml.imageprocessing.util.textOnRectangles",
+            "metadata": {
+                "label": "Text on Rectangles",
+                "x": 2099,
+                "y": -303,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "773,9 899,9"
+            },
+            "src": {
+                "port": "pathOut",
+                "process": "readfiles2"
+            },
+            "tgt": {
+                "port": "pathIn",
+                "process": "loadpickle1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "-32,-268 29,-268"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "capturevideo2"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "framelimiter2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "157,-268 211,-268"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "framelimiter2"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "facedetection2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "773,-363 808,-363 808,-263 843,-263"
+            },
+            "src": {
+                "port": "out1",
+                "process": "12multiplexer1"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "faceembedding1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "773,-159 808,-159 808,-245 843,-245"
+            },
+            "src": {
+                "port": "out1",
+                "process": "13multiplexer1"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "faceembedding1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "773,-123 994,-123 994,-151 1215,-151"
+            },
+            "src": {
+                "port": "out3",
+                "process": "13multiplexer1"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "facematch1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1027,9 1121,9 1121,-169 1215,-169"
+            },
+            "src": {
+                "port": "dictOut",
+                "process": "loadpickle1"
+            },
+            "tgt": {
+                "port": "dictIn",
+                "process": "facematch1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "971,-254 1093,-254 1093,-133 1215,-133"
+            },
+            "src": {
+                "port": "vectorsOut",
+                "process": "faceembedding1"
+            },
+            "tgt": {
+                "port": "vectorsIn",
+                "process": "facematch1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "339,-259 385,-259 385,-277 431,-277"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "facedetection2"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "facedetectioninterpolation2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "339,-277 385,-277 385,-259 431,-259"
+            },
+            "src": {
+                "port": "rectsOut",
+                "process": "facedetection2"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "facedetectioninterpolation2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "559,-277 602,-277 602,-354 645,-354"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "facedetectioninterpolation2"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "12multiplexer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "559,-259 602,-259 602,-141 645,-141"
+            },
+            "src": {
+                "port": "rectsOut",
+                "process": "facedetectioninterpolation2"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "13multiplexer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1343,-151 1410,-151 1410,-228 1477,-228"
+            },
+            "src": {
+                "port": "arrayStringOut",
+                "process": "facematch1"
+            },
+            "tgt": {
+                "port": "nameIn",
+                "process": "facematchinterpolation2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "773,-345 1125,-345 1125,-264 1477,-264"
+            },
+            "src": {
+                "port": "out2",
+                "process": "12multiplexer1"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "facematchinterpolation2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "773,-141 1125,-141 1125,-246 1477,-246"
+            },
+            "src": {
+                "port": "out2",
+                "process": "13multiplexer1"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "facematchinterpolation2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1605,-264 1708.5,-264 1708.5,-356 1812,-356"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "facematchinterpolation2"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "drawrectangles1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1605,-246 1710.5,-246 1710.5,-151 1816,-151"
+            },
+            "src": {
+                "port": "rectsOut",
+                "process": "facematchinterpolation2"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "12multiplexer5"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1944,-160 1994,-160 1994,-267 1762,-267 1762,-374 1812,-374"
+            },
+            "src": {
+                "port": "out1",
+                "process": "12multiplexer5"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "drawrectangles1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1944,-142 2019.5,-142 2019.5,-263 2095,-263"
+            },
+            "src": {
+                "port": "out2",
+                "process": "12multiplexer5"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "textonrectangles2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1605,-228 1850,-228 1850,-245 2095,-245"
+            },
+            "src": {
+                "port": "nameOut",
+                "process": "facematchinterpolation2"
+            },
+            "tgt": {
+                "port": "stringIn",
+                "process": "textonrectangles2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1940,-365 2017.5,-365 2017.5,-281 2095,-281"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "drawrectangles1"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "textonrectangles2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "2223,-263 2281,-263"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "textonrectangles2"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "motionjpgstream1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

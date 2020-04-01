@@ -1,0 +1,883 @@
+{
+	"properties": {},
+	"description": "Sample Merge EDW and IoT",
+	"processes": {
+		"workflowtrigger1": {
+			"component": "com.sap.dh.trigger",
+			"metadata": {
+				"label": "Workflow Trigger",
+				"x": 12,
+				"y": 72,
+				"height": 80,
+				"width": 120,
+				"extensible": true,
+				"config": {}
+			}
+		},
+		"datatransfer1": {
+			"component": "com.sap.dh.bwdatatransfer",
+			"metadata": {
+				"label": "Data Transfer",
+				"x": 181,
+				"y": 72,
+				"height": 80,
+				"width": 120,
+				"extensible": true,
+				"config": {
+					"source": {
+						"remoteObjectReference": {
+							"connection": {
+								"id": "BW",
+								"type": "BW"
+							},
+							"name": "/QUERY/QRY_DIM_CUST",
+							"remoteObjectType": "QUERY",
+							"qualifiedName": "/QUERY/QRY_DIM_CUST",
+							"nativeQualifiedName": "/QUERY/QRY_DIM_CUST",
+							"description": "BW Sales Region"
+						},
+						"schema": {
+							"genericType": "TABLE",
+							"tableBasedRepresentation": {
+								"attributes": [
+									{
+										"name": "2FDIM_CUST-CUSTOMER",
+										"originalName": "2FDIM_CUST-CUSTOMER",
+										"qualifiedName": "2FDIM_CUST-CUSTOMER",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									},
+									{
+										"name": "2FDIM_CUST-FIRST_NAME",
+										"originalName": "2FDIM_CUST-FIRST_NAME",
+										"qualifiedName": "2FDIM_CUST-FIRST_NAME",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									},
+									{
+										"name": "2FDIM_CUST-LAST_NAME",
+										"originalName": "2FDIM_CUST-LAST_NAME",
+										"qualifiedName": "2FDIM_CUST-LAST_NAME",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									},
+									{
+										"name": "2FDIM_CUST-COUNTRY",
+										"originalName": "2FDIM_CUST-COUNTRY",
+										"qualifiedName": "2FDIM_CUST-COUNTRY",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									}
+								],
+								"uniqueKeys": []
+							}
+						},
+						"parameterSetting": {
+							"selectOptions": []
+						}
+					},
+					"target": {
+						"remoteObjectReference": {
+							"connection": {
+								"id": "VORA_EXT",
+								"type": "VORA",
+								"hanaWirePort": "30115"
+							},
+							"qualifiedName": "/default/EXPORTED_CUSTOMER_DATA",
+							"remoteObjectType": ""
+						},
+						"schema": {
+							"dataTypeRef": null,
+							"genericType": "TABLE",
+							"tableBasedRepresentation": {
+								"attributes": [
+									{
+										"name": "2FDIM_CUST-CUSTOMER",
+										"originalName": "2FDIM_CUST-CUSTOMER",
+										"qualifiedName": "2FDIM_CUST-CUSTOMER",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									},
+									{
+										"name": "2FDIM_CUST-FIRST_NAME",
+										"originalName": "2FDIM_CUST-FIRST_NAME",
+										"qualifiedName": "2FDIM_CUST-FIRST_NAME",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									},
+									{
+										"name": "2FDIM_CUST-LAST_NAME",
+										"originalName": "2FDIM_CUST-LAST_NAME",
+										"qualifiedName": "2FDIM_CUST-LAST_NAME",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									},
+									{
+										"name": "2FDIM_CUST-COUNTRY",
+										"originalName": "2FDIM_CUST-COUNTRY",
+										"qualifiedName": "2FDIM_CUST-COUNTRY",
+										"datatype": "STRING",
+										"length": 255,
+										"nativeDatatype": "String",
+										"defaultAggregation": "NONE",
+										"isMultiValued": true,
+										"possibleOperators": [
+											"BETWEEN",
+											"=",
+											">=",
+											">",
+											"<=",
+											"<"
+										],
+										"defaultFilter": []
+									}
+								]
+							}
+						}
+					},
+					"timeout": "400",
+					"partitionSpecification": {
+						"defaultPartition": true,
+						"conditions": []
+					},
+					"sourceSpecificConfiguration": {
+						"bwAccessMethod": "INA"
+					}
+				}
+			}
+		},
+		"workflowsplit1": {
+			"component": "com.sap.dh.split",
+			"metadata": {
+				"label": "Workflow Split",
+				"x": 365.9999990463257,
+				"y": 72,
+				"height": 80,
+				"width": 120,
+				"extensible": true,
+				"config": {}
+			}
+		},
+		"datatransform1": {
+			"component": "com.sap.dh.datatransform",
+			"metadata": {
+				"label": "Data Transform",
+				"x": 550.9999980926514,
+				"y": 12,
+				"height": 80,
+				"width": 120,
+				"extensible": true,
+				"config": {
+					"definition": {
+						"nodeType": "ContainerNode",
+						"inputs": [
+							{
+								"id": "9a4ca3e0-3f2b-460e-b64e-310579dca19a",
+								"nodeType": "DataNode",
+								"name": "DataSource1",
+								"dataset": {
+									"database": "",
+									"description": "",
+									"remoteObjectReference": {
+										"connection": {
+											"id": "HDFS",
+											"type": "HDFS"
+										},
+										"name": "devices.csv",
+										"remoteObjectType": "FILE.CSV",
+										"qualifiedName": "/exercises/devices.csv",
+										"nativeQualifiedName": "/exercises/devices.csv",
+										"owner": "hdfs",
+										"size": 20744,
+										"version": {
+											"dataLastModified": 1545243945000,
+											"metadataLastModified": 1545243945000,
+											"metadataVersionNumber": 1545243945000
+										}
+									},
+									"schema": {
+										"genericType": "TABLE",
+										"tableBasedRepresentation": {
+											"attributes": []
+										}
+									},
+									"dataAccessConfiguration": {
+										"rowDelimiter": "\n",
+										"charset": "ISO-8859-2",
+										"textDelimiter": "\"",
+										"header": true,
+										"escapeCharacter": "\"",
+										"colDelimiter": ";"
+									}
+								},
+								"attributes": [
+									{
+										"id": "bb439c34-256b-42b4-9052-c2245dd68aa8",
+										"name": "DEVICE",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 32
+									},
+									{
+										"id": "4a8984c6-4e1b-4c7c-a4b1-0d8d5d55e6e9",
+										"name": "TYPE",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 7
+									},
+									{
+										"id": "4aeae29b-5937-4627-bdf7-3c3430391fca",
+										"name": "COUNTRY",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 2
+									},
+									{
+										"id": "553338e3-3ce2-4336-8fb7-5260b6208d86",
+										"name": "CUSTOMER",
+										"datatype": "INTEGER",
+										"nullable": false
+									},
+									{
+										"id": "fde55b38-0505-4a2c-8485-733179ba72ec",
+										"name": "TIME",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 27
+									}
+								],
+								"UILayout": {
+									"x": 12,
+									"y": 12,
+									"height": 80,
+									"width": 120
+								}
+							},
+							{
+								"id": "58f34da0-4412-451f-938c-03438433a978",
+								"nodeType": "DataNode",
+								"name": "DataSource2",
+								"dataset": {
+									"database": "",
+									"description": "",
+									"remoteObjectReference": {
+										"connection": {
+											"id": "VORA",
+											"type": "VORA"
+										},
+										"name": "EXPORTED_CUSTOMER_DATA",
+										"remoteObjectType": "TABLE.DATASOURCE",
+										"qualifiedName": "/default/EXPORTED_CUSTOMER_DATA",
+										"nativeQualifiedName": "default.EXPORTED_CUSTOMER_DATA",
+										"version": {}
+									},
+									"schema": {
+										"genericType": "TABLE",
+										"tableBasedRepresentation": {
+											"attributes": []
+										}
+									}
+								},
+								"attributes": [
+									{
+										"id": "2e1021db-b944-4c16-9d24-cc25f0f7dee4",
+										"name": "2FDIM_CUST-CUSTOMER",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 255
+									},
+									{
+										"id": "591234d1-3988-4dbf-8b60-fffd2f7f8025",
+										"name": "2FDIM_CUST-FIRST_NAME",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 255
+									},
+									{
+										"id": "c1a5e877-27f5-4209-90bb-be670325e47a",
+										"name": "2FDIM_CUST-LAST_NAME",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 255
+									},
+									{
+										"id": "c870c056-8726-41a4-8cff-7cd95d3950d8",
+										"name": "2FDIM_CUST-COUNTRY",
+										"datatype": "STRING",
+										"nullable": false,
+										"length": 255
+									}
+								],
+								"UILayout": {
+									"x": 12,
+									"y": 132,
+									"height": 80,
+									"width": 120
+								}
+							}
+						],
+						"outputs": [
+							{
+								"id": "2d482ab8-2079-47cc-a169-4f3b859922c4",
+								"nodeType": "DataNode",
+								"name": "DataTarget1",
+								"dataset": {
+									"database": "",
+									"description": "",
+									"remoteObjectReference": {
+										"connection": {
+											"id": "S3",
+											"type": "S3"
+										},
+										"qualifiedName": "/Solution/BW",
+										"remoteObjectType": "FILE.CSV"
+									},
+									"schema": {
+										"genericType": "TABLE",
+										"tableBasedRepresentation": {
+											"attributes": []
+										}
+									},
+									"dataAccessConfiguration": {
+										"colDelimiter": ",",
+										"rowDelimiter": "\n",
+										"header": true,
+										"textDelimiter": "\"",
+										"escapeCharacter": "\"",
+										"charset": "UTF-8"
+									}
+								},
+								"attributes": [],
+								"mode": "OVERWRITE",
+								"UILayout": {
+									"x": 367.9999990463257,
+									"y": 72,
+									"height": 80,
+									"width": 120
+								}
+							}
+						],
+						"nodes": [
+							{
+								"id": "f1e3fd6c-f120-4d55-8096-bb60e7137764",
+								"type": "JoinNode",
+								"nodeType": "JoinNode",
+								"name": "Join1",
+								"inputs": [
+									{
+										"id": "ab6d83ed-4dee-4ae0-9e40-bd2e3d09cfed",
+										"name": "Join1_Input1",
+										"attributes": [
+											{
+												"id": "aee57986-63ac-44db-9463-915f0ea446f8",
+												"name": "DEVICE",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 32
+											},
+											{
+												"id": "5e6fe9d2-7137-43c1-85d7-c2cc6e178899",
+												"name": "TYPE",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 7
+											},
+											{
+												"id": "849c0b5a-c4a4-44e6-838b-5fde6e9342c8",
+												"name": "COUNTRY",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 2
+											},
+											{
+												"id": "86493cb9-ccbe-4c23-97a7-852df68b454d",
+												"name": "CUSTOMER",
+												"datatype": "INTEGER",
+												"nullable": false
+											},
+											{
+												"id": "fab14d51-2f15-4771-b6f2-d0f166c441c6",
+												"name": "TIME",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 27
+											}
+										]
+									},
+									{
+										"id": "59a42253-5a59-4173-baff-171466e28433",
+										"name": "Join1_Input2",
+										"attributes": [
+											{
+												"id": "8b38958e-a830-43e0-bdbd-3d05189479e5",
+												"name": "2FDIM_CUST-CUSTOMER",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											},
+											{
+												"id": "08992937-b601-4fc1-92e3-760daef22c9a",
+												"name": "2FDIM_CUST-FIRST_NAME",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											},
+											{
+												"id": "f7c1126b-1c20-4266-8fd4-a2c1a7dd614a",
+												"name": "2FDIM_CUST-LAST_NAME",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											},
+											{
+												"id": "b1eea7b6-4b17-4729-9ad2-e128ff8261c8",
+												"name": "2FDIM_CUST-COUNTRY",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											}
+										]
+									}
+								],
+								"outputs": [
+									{
+										"id": "cbae1f97-032b-49bf-b09e-e91e3216a309",
+										"name": "Join1_Output1",
+										"attributes": [
+											{
+												"id": "befd4e1e-f557-4a6e-8617-9e81b795ac3b",
+												"name": "2FDIM_CUST-COUNTRY",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											},
+											{
+												"id": "65c06540-4eb8-401c-9f02-d62d5659056d",
+												"name": "2FDIM_CUST-FIRST_NAME",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											},
+											{
+												"id": "7e78c605-b2f7-4e37-afc0-a1bea9c2db9d",
+												"name": "2FDIM_CUST-LAST_NAME",
+												"datatype": "STRING",
+												"nullable": false,
+												"length": 255
+											}
+										]
+									}
+								],
+								"UILayout": {
+									"x": 197.99999904632568,
+									"y": 72,
+									"height": 80,
+									"width": 120
+								},
+								"joinDefinitions": [
+									{
+										"left": "ab6d83ed-4dee-4ae0-9e40-bd2e3d09cfed",
+										"right": "59a42253-5a59-4173-baff-171466e28433",
+										"type": "INNER",
+										"condition": "\"Join1_Input1\".\"CUSTOMER\" = \"Join1_Input2\".\"2FDIM_CUST-CUSTOMER\""
+									}
+								],
+								"tableMappings": [
+									{
+										"source": "ab6d83ed-4dee-4ae0-9e40-bd2e3d09cfed",
+										"target": "cbae1f97-032b-49bf-b09e-e91e3216a309"
+									},
+									{
+										"source": "59a42253-5a59-4173-baff-171466e28433",
+										"target": "cbae1f97-032b-49bf-b09e-e91e3216a309",
+										"attributeMappings": [
+											{
+												"source": "b1eea7b6-4b17-4729-9ad2-e128ff8261c8",
+												"target": "befd4e1e-f557-4a6e-8617-9e81b795ac3b"
+											},
+											{
+												"source": "08992937-b601-4fc1-92e3-760daef22c9a",
+												"target": "65c06540-4eb8-401c-9f02-d62d5659056d"
+											},
+											{
+												"source": "f7c1126b-1c20-4266-8fd4-a2c1a7dd614a",
+												"target": "7e78c605-b2f7-4e37-afc0-a1bea9c2db9d"
+											}
+										]
+									}
+								]
+							}
+						],
+						"tableMappings": [
+							{
+								"source": "9a4ca3e0-3f2b-460e-b64e-310579dca19a",
+								"target": "ab6d83ed-4dee-4ae0-9e40-bd2e3d09cfed",
+								"attributeMappings": [
+									{
+										"source": "bb439c34-256b-42b4-9052-c2245dd68aa8",
+										"target": "aee57986-63ac-44db-9463-915f0ea446f8"
+									},
+									{
+										"source": "4a8984c6-4e1b-4c7c-a4b1-0d8d5d55e6e9",
+										"target": "5e6fe9d2-7137-43c1-85d7-c2cc6e178899"
+									},
+									{
+										"source": "4aeae29b-5937-4627-bdf7-3c3430391fca",
+										"target": "849c0b5a-c4a4-44e6-838b-5fde6e9342c8"
+									},
+									{
+										"source": "553338e3-3ce2-4336-8fb7-5260b6208d86",
+										"target": "86493cb9-ccbe-4c23-97a7-852df68b454d"
+									},
+									{
+										"source": "fde55b38-0505-4a2c-8485-733179ba72ec",
+										"target": "fab14d51-2f15-4771-b6f2-d0f166c441c6"
+									}
+								],
+								"UILayout": {
+									"points": "132,52 165,52 165,103 197.99999904632568,103"
+								}
+							},
+							{
+								"source": "58f34da0-4412-451f-938c-03438433a978",
+								"target": "59a42253-5a59-4173-baff-171466e28433",
+								"attributeMappings": [
+									{
+										"source": "2e1021db-b944-4c16-9d24-cc25f0f7dee4",
+										"target": "8b38958e-a830-43e0-bdbd-3d05189479e5"
+									},
+									{
+										"source": "591234d1-3988-4dbf-8b60-fffd2f7f8025",
+										"target": "08992937-b601-4fc1-92e3-760daef22c9a"
+									},
+									{
+										"source": "c1a5e877-27f5-4209-90bb-be670325e47a",
+										"target": "f7c1126b-1c20-4266-8fd4-a2c1a7dd614a"
+									},
+									{
+										"source": "c870c056-8726-41a4-8cff-7cd95d3950d8",
+										"target": "b1eea7b6-4b17-4729-9ad2-e128ff8261c8"
+									}
+								],
+								"UILayout": {
+									"points": "132,172 165,172 165,121 197.99999904632568,121"
+								}
+							},
+							{
+								"source": "cbae1f97-032b-49bf-b09e-e91e3216a309",
+								"target": "2d482ab8-2079-47cc-a169-4f3b859922c4",
+								"attributeMappings": [],
+								"UILayout": {
+									"points": "317.9999990463257,112 367.9999990463257,112"
+								}
+							}
+						],
+						"invalidMappings": []
+					}
+				}
+			}
+		},
+		"javascriptoperator1": {
+			"component": "com.sap.system.jsengine",
+			"metadata": {
+				"label": "JavaScript Operator",
+				"x": 550.9999980926514,
+				"y": 132,
+				"height": 80,
+				"width": 120,
+				"extensible": true,
+				"config": {
+					"script": "var counter = 0;\n\n$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    counter++;\n    $.output(\"select count(*) from \\\"default\\\".\\\"EXPORTED_CUSTOMER_DATA\\\"\");\n}"
+				}
+			}
+		},
+		"sapvoraclient1": {
+			"component": "com.sap.vora.client2",
+			"metadata": {
+				"label": "SAP Vora Client",
+				"x": 735.999997138977,
+				"y": 86.49999976158142,
+				"height": 80,
+				"width": 120,
+				"config": {
+					"connection": {
+						"connectionProperties": {
+							"host": "host",
+							"password": "",
+							"port": "9090",
+							"tenant": "sap",
+							"user": ""
+						},
+						"configurationType": "Configuration Manager",
+						"connectionID": "VORA_EXT"
+					}
+				}
+			}
+		},
+		"terminal1": {
+			"component": "com.sap.util.terminal",
+			"metadata": {
+				"label": "Terminal",
+				"x": 1035.9999952316284,
+				"y": 86.49999976158142,
+				"height": 80,
+				"width": 120,
+				"ui": "dynpath",
+				"config": {}
+			}
+		},
+		"tostringconverter1": {
+			"component": "com.sap.util.toStringConverter",
+			"metadata": {
+				"label": "ToString Converter",
+				"x": 920.9999961853027,
+				"y": 101.49999976158142,
+				"height": 50,
+				"width": 50,
+				"config": {}
+			}
+		},
+		"workflowmergeor1": {
+			"component": "com.sap.dh.logical.OR",
+			"metadata": {
+				"label": "Workflow Merge (OR)",
+				"x": 1220.999994277954,
+				"y": 72,
+				"height": 80,
+				"width": 120,
+				"extensible": true,
+				"config": {}
+			}
+		},
+		"workflowterminator1": {
+			"component": "com.sap.dh.terminator",
+			"metadata": {
+				"label": "Workflow Terminator",
+				"x": 1389.999994277954,
+				"y": 72,
+				"height": 80,
+				"width": 120,
+				"config": {}
+			}
+		}
+	},
+	"groups": [],
+	"connections": [
+		{
+			"metadata": {
+				"points": "136,112 176,112"
+			},
+			"src": {
+				"port": "output",
+				"process": "workflowtrigger1"
+			},
+			"tgt": {
+				"port": "input",
+				"process": "datatransfer1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "305,103 332.99999952316284,103 332.99999952316284,112 360.9999990463257,112"
+			},
+			"src": {
+				"port": "output",
+				"process": "datatransfer1"
+			},
+			"tgt": {
+				"port": "in",
+				"process": "workflowsplit1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "489.9999990463257,103 517.9999985694885,103 517.9999985694885,52 545.9999980926514,52"
+			},
+			"src": {
+				"port": "out1",
+				"process": "workflowsplit1"
+			},
+			"tgt": {
+				"port": "input",
+				"process": "datatransform1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "489.9999990463257,121 517.9999985694885,121 517.9999985694885,172 545.9999980926514,172"
+			},
+			"src": {
+				"port": "out2",
+				"process": "workflowsplit1"
+			},
+			"tgt": {
+				"port": "input",
+				"process": "javascriptoperator1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "674.9999980926514,172 702.9999976158142,172 702.9999976158142,126.49999976158142 730.999997138977,126.49999976158142"
+			},
+			"src": {
+				"port": "output",
+				"process": "javascriptoperator1"
+			},
+			"tgt": {
+				"port": "sql",
+				"process": "sapvoraclient1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "859.999997138977,126.49999976158142 887.9999966621399,126.49999976158142 887.9999966621399,117.49999976158142 915.9999961853027,117.49999976158142"
+			},
+			"src": {
+				"port": "result",
+				"process": "sapvoraclient1"
+			},
+			"tgt": {
+				"port": "ininterface",
+				"process": "tostringconverter1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "974.9999961853027,126.49999976158142 1030.9999952316284,126.49999976158142"
+			},
+			"src": {
+				"port": "outstring",
+				"process": "tostringconverter1"
+			},
+			"tgt": {
+				"port": "in1",
+				"process": "terminal1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "674.9999980926514,43 702.9999976158142,43 702.9999976158142,57.50000023841858 887.9999966621399,57.50000023841858 887.9999966621399,72.50000023841858 1002.9999957084656,72.50000023841858 1002.9999957084656,57.50000023841858 1187.9999947547913,57.50000023841858 1187.9999947547913,103 1215.999994277954,103"
+			},
+			"src": {
+				"port": "output",
+				"process": "datatransform1"
+			},
+			"tgt": {
+				"port": "input",
+				"process": "workflowmergeor1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "1159.9999952316284,126.49999976158142 1187.9999947547913,126.49999976158142 1187.9999947547913,121 1215.999994277954,121"
+			},
+			"src": {
+				"port": "out1",
+				"process": "terminal1"
+			},
+			"tgt": {
+				"port": "input2",
+				"process": "workflowmergeor1"
+			}
+		},
+		{
+			"metadata": {
+				"points": "1344.999994277954,112 1384.999994277954,112"
+			},
+			"src": {
+				"port": "output",
+				"process": "workflowmergeor1"
+			},
+			"tgt": {
+				"port": "stop",
+				"process": "workflowterminator1"
+			}
+		}
+	],
+	"inports": {},
+	"outports": {}
+}

@@ -1,0 +1,24 @@
+{
+    "iconsrc": "test1",
+    "icon": "address-book",
+    "description": "",
+    "processes": {
+        "datagenerator1": {
+            "component": "com.sap.util.dataGenerator",
+            "metadata": {
+                "label": "Data Generator",
+                "x": 381,
+                "y": 131,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [],
+    "inports": {},
+    "outports": {},
+    "properties": {}
+}

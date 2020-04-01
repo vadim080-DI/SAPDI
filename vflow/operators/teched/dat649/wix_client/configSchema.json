@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/teched.dat649.wix_client.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string",
+            "sap_vflow_constraints": {
+                "ui_visibility": false
+            }
+        },
+        "state": {
+            "title": "State",
+            "description": "State to be sent to the server",
+            "type": "string",
+            "enum": [
+                "Just Started",
+                "Moving Forward",
+                "Completed"
+            ]
+        },
+        "script": {
+            "type": "string",
+            "sap_vflow_constraints": {
+                "ui_visibility": false
+            }
+        },
+        "group_id": {
+            "title": "Group ID",
+            "description": "Group ID",
+            "type": "string"
+        }
+    },
+    "required": [
+        "state",
+        "group_id"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/com.sap.ariba.recsys_collabfilter1.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string"
+        },
+        "script": {
+            "type": "string"
+        },
+        "rating_range": {
+            "title": "Rating Range",
+            "description": "Integer values from,to string",
+            "type": "string"
+        }
+    }
+}

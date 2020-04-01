@@ -1,0 +1,174 @@
+{
+    "properties": {},
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "/vrep/vflow/files/data.json",
+                    "onlyReadOnChange": true
+                }
+            }
+        },
+        "formatconverter1": {
+            "component": "com.sap.util.formatConverter",
+            "metadata": {
+                "label": "Format Converter",
+                "x": 399.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "targetFormat": "CSV",
+                    "fields": "buyer_name,buyer_code,supplier_name,supplier_code,account_name,account_code,remit_to_address_code,job_posting_owner,work_order_id,worker_id,job_seeker_id,worker_last_name,worker_first_name,site_code,site_name,business_unit_code,business_unit_name,final_approver_first_name,final_approver_last_name,final_approver_employee_id,final_approver_email,time_sheet_id,time_sheet_status,time_sheet_start_date,time_sheet_end_date,time_sheet_submit_date_time,time_sheet_approved_date,time_entry_date,cost_center_code,cost_center_name,task_code,task_name,general_ledger_account_code,billable_per_diem,billable_hours,non_billable_hours,total_hours,billable_amount,currency,rate_category_uom,bill_rate_buyer,bill_rate_supplier,pay_rate"
+                }
+            }
+        },
+        "toblobconverter1": {
+            "component": "com.sap.util.toBlobConverter",
+            "metadata": {
+                "label": "ToBlob Converter",
+                "x": 300.9999990463257,
+                "y": 27,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "tostringconverter1": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 201.99999904632568,
+                "y": 27,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 667.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "/vrep/vflow/files/data.csv",
+                    "mode": "overwrite"
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 836.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "toblobconverter2": {
+            "component": "com.sap.util.toBlobConverter",
+            "metadata": {
+                "label": "ToBlob Converter",
+                "x": 568.9999990463257,
+                "y": 27,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "141,61 168.99999952316284,61 168.99999952316284,43 196.99999904632568,43"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "354.9999990463257,52 394.9999990463257,52"
+            },
+            "src": {
+                "port": "outbytearray",
+                "process": "toblobconverter1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "formatconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "791.9999990463257,52 831.9999990463257,52"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "622.9999990463257,52 662.9999990463257,52"
+            },
+            "src": {
+                "port": "outbytearray",
+                "process": "toblobconverter2"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "255.99999904632568,52 295.9999990463257,52"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "toblobconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "523.9999990463257,52 563.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "formatconverter1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "toblobconverter2"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

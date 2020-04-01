@@ -1,0 +1,597 @@
+{
+    "properties": {},
+    "iconsrc": "../IoT.png",
+    "description": "Completed EBike IoT Issue Detection",
+    "processes": {
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 719,
+                "y": 923,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "python3operator2": {
+            "component": "com.sap.system.python3Operator",
+            "metadata": {
+                "label": "Pause",
+                "x": 504,
+                "y": 923,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import time\n\ndef on_input(message):\n    time.sleep(120) # Simulates messages coming in with a time period between them\n    api.send(\"output\", \"test\")\n    \napi.set_port_callback(\"input\",on_input)"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "string"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "workflowtrigger1": {
+            "component": "com.sap.dh.trigger",
+            "metadata": {
+                "label": "Trigger",
+                "x": 283,
+                "y": 923,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "kafkaconsumer1": {
+            "component": "com.sap.kafka.consumer2",
+            "metadata": {
+                "label": "Kafka Consumer",
+                "x": 298,
+                "y": 501,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "brokers": "kafkaserver:9092",
+                    "groupId": "Group1",
+                    "topics": "bike_sensor_topic_Master"
+                }
+            }
+        },
+        "messageoperator2": {
+            "component": "com.sap.system.jsmengine",
+            "metadata": {
+                "label": "Parse Data & Create SQL",
+                "x": 644,
+                "y": 501,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var inbody = s.Body;\n    var inattributes = s.Attributes;\n\n    inbody = String.fromCharCode.apply(null, inbody);\n    IoTMessage = inbody.split(',')\n    var serialNumber = IoTMessage[1];\n    var sensorType = IoTMessage[2];\n    var sensorMeasurement = IoTMessage[3].replace(/(\\r\\n|\\n|\\r)/gm,\"\");\n\n    var sql = \"select * from DATAHUB_1.VELOTICS_BIKE_DATA where BIKE_SERIAL_NUM = \\'\" + serialNumber  +\"\\'\"  \n    var msg = {};\n    msg.Body = sql\n    msg.Attributes = {};\n    msg.Attributes.sensorType = sensorType;\n    msg.Attributes.sensorMeasurement = sensorMeasurement\n    $.output(msg);\n\n}\n"
+                }
+            }
+        },
+        "saphanaclient1": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "Get Bike Data",
+                "x": 1006,
+                "y": 501,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "additionalHosts": [],
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "useTLS": false,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 298,
+                "y": 686,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "messageoperator4": {
+            "component": "com.sap.system.jsmengine",
+            "metadata": {
+                "label": "Find Issues",
+                "x": 459,
+                "y": 686,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var msg = {};\n\n    var bikeData = s.Body[0];\n    sensorType = s.Attributes.sensorType;\n    sensorValue = s.Attributes.sensorMeasurement;\n    bikeData.SENSOR_MEASUREMENT = parseFloat(sensorValue);\n    bikeData.ISSUE_TYPE = \"\"\n    \n    switch (sensorType){\n        case \"tirepressure\":\n            if (sensorValue < bikeData.MINIMUN_TIRE_PSI)\n            {\n                bikeData.ISSUE_TYPE = 'Low Tire Pressure';  \n                var email = new Array(bikeData.CUSTOMER_EMAIL);\n                 msg.Attributes = {\"email.to\":new Array(bikeData.CUSTOMER_EMAIL) };\n                 msg.Body = \"Dear Customer,\\nIt appears that your Velotics bike has a tire that is low on air. For best performance please inflate to the recommended PSI.\\n\\nThank you and have a great day.\\nVelotics Customer Care\";\n   \n                $.notify(msg);\n            }\n            break;\n                 \n        case \"lightout\":\n            bikeData.ISSUE_TYPE = 'Light Out';  \n            break;\n        \n        case \"batterymaxcharge\":\n            if (sensorValue < bikeData.MINIMUM_BATTERY_VOLTAGE)\n            {\n                bikeData.ISSUE_TYPE = 'Battery Not Charging'; \n            }\n            break;\n            \n        case \"batterytemp\":\n            if (sensorValue > bikeData.MAXIMUM_BATTERY_TEMPERATURE)\n            {\n                bikeData.ISSUE_TYPE = 'Battery Overheating';  \n            }\n            break;        \n        }\n    \n    if (bikeData.ISSUE_TYPE !== \"\")\n    {\n         $.output({Body:s.Body});\n    }\n\n}\n\n"
+                },
+                "additionaloutports": [
+                    {
+                        "name": "notify",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 823,
+                "y": 501,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap4": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 480,
+                "y": 501,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "notification1": {
+            "component": "com.sap.dh.notification",
+            "metadata": {
+                "label": "E-mail Customer",
+                "x": 659,
+                "y": 766,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "smtp.gmail.com",
+                            "password": "InnovationRocks1!",
+                            "port": 587,
+                            "user": "sapinnovationexperience@gmail.com"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "INNOVATION_ACADEMY_EMAIL_CONNECTION"
+                    },
+                    "defaultSubject": "Master Velotics Bike - Low Tire Pressure Alert",
+                    "defaultFrom": "CustomerCare@Velotics.com"
+                }
+            }
+        },
+        "saphanaclient2": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "Load Issues in HANA",
+                "x": 862,
+                "y": 651,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "tableName": "\"DATAHUB_1\".\"VELOTICS_IOT_ISSUES\"",
+                    "tableColumns": [
+                        {
+                            "name": "BIKE_SERIAL_NUM",
+                            "type": "NVARCHAR",
+                            "size": 50
+                        },
+                        {
+                            "name": "BIKE_MODEL",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "PURCHASE_DATE",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "STORE_NAME",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "STORE_ADDRESS",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "STORE_CITY",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "STORE_STATE",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "STORE_ZIP",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "MINIMUN_TIRE_PSI",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "MINIMUM_BATTERY_VOLTAGE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "MAXIMUM_BATTERY_TEMPERATURE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "CUSTOMER_EMAIL",
+                            "type": "NVARCHAR",
+                            "size": 255
+                        },
+                        {
+                            "name": "LATITUDE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "LONGITUDE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "ISSUE_TYPE",
+                            "type": "NVARCHAR",
+                            "size": 50
+                        },
+                        {
+                            "name": "SENSOR_MEASUREMENT",
+                            "type": "DOUBLE"
+                        }
+                    ],
+                    "connection": {
+                        "connectionProperties": {
+                            "additionalHosts": [],
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "useTLS": false,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    },
+                    "inputFormat": "JSON",
+                    "initTable": "Truncate"
+                }
+            }
+        },
+        "wiretap5": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 659,
+                "y": 651,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "kafkaproducer1": {
+            "component": "com.sap.kafka.producer",
+            "metadata": {
+                "label": "Kafka Producer",
+                "x": 823,
+                "y": 356,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "brokers": "kafkaserver:9092",
+                    "topic": "bike_sensor_topic_Master"
+                }
+            }
+        },
+        "python3operator1": {
+            "component": "com.sap.system.python3Operator",
+            "metadata": {
+                "label": "Send 1 at a Time",
+                "x": 480,
+                "y": 356,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import time\n\ndef on_input(message):\n    lines = ''.join(map(chr, message.body)).splitlines()[1:] #  convert from UTF code to string & remove the header line\n    \n    for line in lines:\n        if len(line)>1:\n          api.send(\"output\", api.Message(line))\n          time.sleep(1) # Simulates messages coming in with a time period between them\n    \n\napi.set_port_callback(\"input\",on_input)"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "wiretap3": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 644,
+                "y": 356,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.file.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 233,
+                "y": 356,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "mode": "Once",
+                    "connection": {
+                        "configurationType": "Connection Management",
+                        "connectionID": "S3"
+                    },
+                    "path": "/VeloticsIOTCollection.csv"
+                }
+            }
+        },
+        "fromfile1": {
+            "component": "com.sap.file.fromFile",
+            "metadata": {
+                "label": "From File",
+                "x": 396.5,
+                "y": 363,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        }
+    },
+    "groups": [
+        {
+            "name": "group1",
+            "nodes": [
+                "graphterminator1",
+                "python3operator2",
+                "workflowtrigger1"
+            ],
+            "metadata": {
+                "description": "Terminate Graph after some time"
+            }
+        }
+    ],
+    "connections": [
+        {
+            "metadata": {
+                "points": "422,726 454,726"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messageoperator4"
+            }
+        },
+        {
+            "metadata": {
+                "points": "768,541 818,541"
+            },
+            "src": {
+                "port": "output",
+                "process": "messageoperator2"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "422,532 448.5,532 448.5,541 475,541"
+            },
+            "src": {
+                "port": "message",
+                "process": "kafkaconsumer1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap4"
+            }
+        },
+        {
+            "metadata": {
+                "points": "604,541 639,541"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap4"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messageoperator2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "583,717 618.5,717 618.5,691 654,691"
+            },
+            "src": {
+                "port": "output",
+                "process": "messageoperator4"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap5"
+            }
+        },
+        {
+            "metadata": {
+                "points": "604,396 639,396"
+            },
+            "src": {
+                "port": "output",
+                "process": "python3operator1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "768,396 818,396"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap3"
+            },
+            "tgt": {
+                "port": "message",
+                "process": "kafkaproducer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "947,541 974,541 974,532 1001,532"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap2"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "saphanaclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1130,541 1180,541 1180,633.5 243,633.5 243,726 293,726"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "583,735 618.5,735 618.5,806 654,806"
+            },
+            "src": {
+                "port": "notify",
+                "process": "messageoperator4"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "notification1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "783,691 820,691 820,700 857,700"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap5"
+            },
+            "tgt": {
+                "port": "data",
+                "process": "saphanaclient2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "407,963 499,963"
+            },
+            "src": {
+                "port": "output",
+                "process": "workflowtrigger1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "python3operator2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "628,963 714,963"
+            },
+            "src": {
+                "port": "output",
+                "process": "python3operator2"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "357,387 374.25,387 374.25,388 391.5,388"
+            },
+            "src": {
+                "port": "file",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "file",
+                "process": "fromfile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "431.5,396.5 494,396.5"
+            },
+            "src": {
+                "port": "message",
+                "process": "fromfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "python3operator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

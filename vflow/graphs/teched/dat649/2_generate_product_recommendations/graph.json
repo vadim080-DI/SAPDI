@@ -1,0 +1,373 @@
+{
+    "properties": {},
+    "description": "2. Generate Product Recommendations",
+    "processes": {
+        "saphanaclient1": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 196.99999904632568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    }
+                }
+            }
+        },
+        "blankjavascriptoperator1": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Select Product",
+                "x": 12,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var sent = false;\r\n\r\n$.addTimer(\"1s\",sendSQLStatement);\r\n\r\nfunction sendSQLStatement(ctx) {\r\n    if (sent === true ) {\r\n        //return;\r\n    }\r\n    var sql = \"SELECT * FROM \" + $.config.getString(\"schema\") + \".PRODUCT\"\r\n\r\n    $.sqlStatement({Attributes: {}, Body: sql});\r\n    sent = true;\r\n}",
+                    "schema": "${GroupID}"
+                },
+                "additionaloutports": [
+                    {
+                        "name": "sqlStatement",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "saphanaclient2": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 196.99999904632568,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    }
+                }
+            }
+        },
+        "blankjavascriptoperator2": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "Select SOItem",
+                "x": 12,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var sent = false;\r\n\r\n$.addTimer(\"1s\",sendSQLStatement);\r\n\r\nfunction sendSQLStatement(ctx) {\r\n    if (sent === true ) {\r\n        //return;\r\n    }\r\n    var sql = \"SELECT * FROM \" + $.config.getString(\"schema\") + \".SOITEM\"\r\n\r\n    $.sqlStatement({Attributes: {}, Body: sql});\r\n    sent = true;\r\n}",
+                    "schema": "${GroupID}"
+                },
+                "additionaloutports": [
+                    {
+                        "name": "sqlStatement",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "tostringconverter1": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 381.99999809265137,
+                "y": 42,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "tostringconverter2": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 381.99999809265137,
+                "y": 132,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "wixclient1": {
+            "component": "teched.dat649.wix_client",
+            "metadata": {
+                "label": "Moving Forward",
+                "x": 1150.999994277954,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "group_id": "${GroupID}",
+                    "state": "Moving Forward",
+                    "script": "$.addGenerator(init);\r\n$.addShutdownHandler(shutdown);\r\n$.setPortCallback(\"input\",onInput);\r\n\r\n// This example shows basic usage of a subgraph\r\n// It calls a subgraph with a parameter, provide input on an input port,\r\n// check output on an ouptput port and stop the subgraph\r\n\r\nvar graphName = \"teched.dat649.internal.wix_client_subgraph\";\r\nvar graphHandle;\r\nvar state = $.config.getString(\"state\");\r\nvar groupID = $.config.getString(\"group_id\");\r\n\r\nfunction init(ctx) {\r\n    // start subgraph\r\n    graphHandle = $.instantiateGraph(graphName,\r\n        {\"state\": state,\"groupid\": groupID},\r\n        // handle subgraph output port with name 'output'\r\n        {\"output\":function(ctx,s){\r\n            if ($.output !== null) {\r\n                $.output(\"Result:\" + s);\r\n            }\r\n        }}\r\n  );\r\n}\r\n\r\nfunction shutdown(ctx) {\r\n    // stop subgraph\r\n    graphHandle.stop();\r\n}\r\n\r\nfunction onInput(ctx,input) {\r\n    // write string in subraph input port with name 'input'\r\n    graphHandle.input(input);\r\n    var block = true;\r\n    graphHandle.eventLoopIteration(block);\r\n}"
+                }
+            }
+        },
+        "tostringconverter3": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 1051.999994277954,
+                "y": 87,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "terminal1": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Terminal",
+                "x": 1319.999994277954,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "fpgrowth1": {
+            "component": "teched.dat649.fpgrowth",
+            "metadata": {
+                "label": "FPGrowth",
+                "x": 496.99999713897705,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "terminal2": {
+            "component": "com.sap.util.terminal",
+            "metadata": {
+                "label": "Terminal",
+                "x": 681.9999961853027,
+                "y": 27,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 866.9999952316284,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "hdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "mode": "overwrite",
+                    "path": "/teched/dat649/${GroupID}/rules.txt"
+                }
+            }
+        },
+        "tomessageconverter1": {
+            "component": "com.sap.util.toMessageConverter",
+            "metadata": {
+                "label": "ToMessage Converter",
+                "x": 716.4999961853027,
+                "y": 147,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "136,52 163.99999952316284,52 163.99999952316284,43 191.99999904632568,43"
+            },
+            "src": {
+                "port": "sqlStatement",
+                "process": "blankjavascriptoperator1"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "saphanaclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "136,172 163.99999952316284,172 163.99999952316284,163 191.99999904632568,163"
+            },
+            "src": {
+                "port": "sqlStatement",
+                "process": "blankjavascriptoperator2"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "saphanaclient2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "320.9999990463257,172 348.9999985694885,172 348.9999985694885,148 376.99999809265137,148"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient2"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1105.999994277954,112 1145.999994277954,112"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter3"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "wixclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1274.999994277954,112 1314.999994277954,112"
+            },
+            "src": {
+                "port": "output",
+                "process": "wixclient1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "435.99999809265137,157 463.9999976158142,157 463.9999976158142,121 491.99999713897705,121"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter2"
+            },
+            "tgt": {
+                "port": "soitemData",
+                "process": "fpgrowth1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "620.999997138977,103 648.9999966621399,103 648.9999966621399,67 676.9999961853027,67"
+            },
+            "src": {
+                "port": "rulesPreview",
+                "process": "fpgrowth1"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "terminal2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "620.999997138977,121 648.9999966621399,121 648.9999966621399,163 711.4999961853027,163"
+            },
+            "src": {
+                "port": "rulesAll",
+                "process": "fpgrowth1"
+            },
+            "tgt": {
+                "port": "inbody",
+                "process": "tomessageconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "770.4999961853027,172 833.9999957084656,172 833.9999957084656,112 861.9999952316284,112"
+            },
+            "src": {
+                "port": "out",
+                "process": "tomessageconverter1"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "990.9999952316284,112 1018.9999947547913,112 1018.9999947547913,121 1046.999994277954,121"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "inmessage",
+                "process": "tostringconverter3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "320.9999990463257,52 349,52 349,58 376.99999809265137,58"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "435.99999809265137,67 464,67 464,103 491.99999713897705,103"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter1"
+            },
+            "tgt": {
+                "port": "productData",
+                "process": "fpgrowth1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

@@ -1,0 +1,226 @@
+{
+    "properties": {},
+    "description": "DAT361: Review Extraction and Ingestion",
+    "processes": {
+        "python2operator1": {
+            "component": "com.sap.system.python2Operator",
+            "metadata": {
+                "label": "Python2Operator",
+                "x": 221.99999904632568,
+                "y": 160,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import hashlib\nimport json\nimport textblob\n\ndef force_unicode(m):\n    try:\n        return unicode(m)\n    except UnicodeDecodeError:\n        ascii = str(m).encode('string_escape')\n        return unicode(ascii)\n\ndef parse_review_body(txt):\n    \"\"\"\n    Parse reviews provided by textual body (one review per line).\n    \"\"\"\n    lines = txt.split(\"\\n\")\n    records = []\n    for line in lines:\n        # forcefully handle encoding issues\n        line = force_unicode(line.strip())\n        if line == \"\": continue\n        records.append(parse_review(line))\n    jsonout = json.dumps(records)\n    return jsonout\n\ndef parse_review(line):\n    \"\"\"\n    Parses a review of format: <PRODUCT-ID> Review: <REVIEW-TEXT>.\n    Extracts the following attributes and textual features:\n    \n    Extracts product ID (ID), text length (LENGTH), text (TEXT), sentiment polarity (POLARITY), and\n    sentiment subjectivity (SUBJECTIVITY). Returns information as a dictinary.\n    \"\"\"\n    try:\n        md5 = hashlib.md5(line).hexdigest()\n        rid, text = line.split(\": \", 1)\n        tb = textblob.TextBlob(text)\n        return { \"ID\": rid[:7],\n                 \"MD5\": md5,\n                 \"LENGTH\": len(text), \n                 \"TEXT\": force_unicode(line),\n                 \"POLARITY\": tb.polarity,\n                 \"SUBJECTIVITY\": tb.subjectivity }\n    except ValueError, e:\n        raise ValueError(\"Line does not match expceted format \\\"<PRODUCT-ID> Review: <REVIEW-TEXT>\\\"; LINE: \\\"%s\\\"; ERROR: %s\" % (line, str(e)))\n    except Exception, e:\n        # just forward\n        raise e\n\n# ////////////////////////////////////////////////////////////\n# Wrap parser in python operator\n# ////////////////////////////////////////////////////////////\n\ndef on_input(msg):\n    # inform downstream operators about last file:\n    # set message.commit.token = 1 for last file\n    commit_token = \"0\"\n    if msg.attributes[\"storage.endOfSequence\"]:\n        commit_token = \"1\"\n    \n    # parse the line-based input    \n    parsed_as_json = parse_review_body(msg.body)\n    \n    output_message = api.Message(parsed_as_json, {\"message.commit.token\": commit_token})\n    api.send(\"output\", output_message)\n\napi.set_port_callback(\"input\", on_input)"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 92,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "webhdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "path": "/DAT361/Product_Reviews/",
+                    "pattern": ".*txt",
+                    "pollPeriodInMs": "10000",
+                    "awsConnection": {
+                        "connectionProperties": {
+                            "accessKey": "AWSAccessKeyId",
+                            "awsProxy": "",
+                            "endpoint": "",
+                            "protocol": "HTTPS",
+                            "region": "eu-central-1",
+                            "rootPath": "",
+                            "secretKey": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "S3"
+                    },
+                    "awsBucket": "bucket1",
+                    "recursive": true,
+                    "onlyReadOnChange": true,
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 204.99999904632568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "voraavroingestor1": {
+            "component": "com.sap.vora.avroingestor",
+            "metadata": {
+                "label": "Vora Avro Ingestor",
+                "x": 426.99999809265137,
+                "y": 92,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "defaultAvroSchema": "{    \"type\": \"record\",   \"namespace\": \"\",   \"name\": \"PRODUCT_REVIEWS\",   \"fields\": [      { \"name\": \"ID\", \"type\": \"string\", \"maxLength\": 7 },     { \"name\": \"MD5\", \"type\": \"string\", \"maxLength\": 32, \"primaryKey\": true },     { \"name\": \"LENGTH\", \"type\": \"int\" },     {\"name\": \"TEXT\", \"type\": \"string\", \"maxLength\": 1024 },     { \"name\": \"POLARITY\", \"type\": \"float\" },     {\"name\": \"SUBJECTIVITY\", \"type\": \"float\" }   ] }",
+                    "dsn": "v2://localhost:50000/?binary=true",
+                    "connectionType": "connection",
+                    "connection": {
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "VORA",
+                        "connectionProperties": {}
+                    },
+                    "ingestionMode": "UPSERT",
+                    "format": "json",
+                    "varLimit": "",
+                    "databaseSchema": "DAT361"
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 757,
+                "y": 92,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "messagestopeventhandler1": {
+            "component": "com.sap.message.stop_event_handler",
+            "metadata": {
+                "label": "Message Stop Event Handler",
+                "x": 593,
+                "y": 92,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        }
+    },
+    "groups": [
+        {
+            "name": "group1",
+            "nodes": [
+                "python2operator1"
+            ],
+            "metadata": {
+                "description": "Group"
+            },
+            "tags": {
+                "textblob": "0.12.0"
+            }
+        }
+    ],
+    "connections": [
+        {
+            "metadata": {
+                "points": "141,123 168.99999952316284,123 168.99999952316284,52 199.99999904632568,52"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,141 168.99999952316284,141 168.99999952316284,200 216.99999904632568,200"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "python2operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "345.9999990463257,200 393.9999985694885,200 393.9999985694885,132 421.99999809265137,132"
+            },
+            "src": {
+                "port": "output",
+                "process": "python2operator1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "voraavroingestor1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "550.9999980926514,132 588,132"
+            },
+            "src": {
+                "port": "out",
+                "process": "voraavroingestor1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagestopeventhandler1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "717,132 752,132"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagestopeventhandler1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

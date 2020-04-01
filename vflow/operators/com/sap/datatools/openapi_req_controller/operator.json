@@ -1,0 +1,1 @@
+{"description":"OpenAPI Request Controller","component":"com.sap.system.jsengine","inports":[{"name":"input","type":"message"}],"outports":[{"name":"out1","type":"message"}],"icon":"chevron-circle-right","config":{"$type":"http://sap.com/vflow/com.sap.datatools.openapi_req_controller.configSchema.json","script":"file://script.js"}}

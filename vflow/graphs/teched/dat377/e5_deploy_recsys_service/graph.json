@@ -1,0 +1,53 @@
+{
+    "properties": {},
+    "description": "[DAT377] Deploy RecSys Service",
+    "processes": {
+        "collaborativefilteringmodel1": {
+            "component": "com.sap.ariba.recsys_collabfilter1",
+            "metadata": {
+                "label": "Collaborative Filtering Model",
+                "x": 201.99999904632568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "rating_range": "1,2"
+                }
+            }
+        },
+        "blobconsumer1": {
+            "component": "com.sap.blob.consumer",
+            "metadata": {
+                "label": "Blob Consumer",
+                "x": -3,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "blobType": "model",
+                    "blobName": "com.sap.ariba.recsys.cb1",
+                    "blobVersion": "1"
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "121,52 159,52 159,70 196.99999904632568,70"
+            },
+            "src": {
+                "port": "outBlob",
+                "process": "blobconsumer1"
+            },
+            "tgt": {
+                "port": "inmodel",
+                "process": "collaborativefilteringmodel1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

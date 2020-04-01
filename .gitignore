@@ -1,0 +1,9 @@
+ca/
+dex/
+launchpad/
+vflow/general/
+vflow/subdevkits/
+vflow/var/
+vflow/.repoid
+*.pyc
+__pycache__/

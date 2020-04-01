@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "http://sap.com/vflow/com.sap.datatools.message_filter.configSchema.json",
+    "type": "object",
+    "properties": {
+        "codelanguage": {
+            "type": "string",
+            "sap_vflow_constraints": {
+                "ui_visibility": false,
+                "ui_disabled": true
+            }
+        },
+        "script": {
+            "type": "string",
+            "sap_vflow_constraints": {
+                "ui_visibility": false,
+                "ui_disabled": true
+            }
+        },
+        "condition": {
+            "title": "Condition",
+            "description": "AND Conditions as JSON",
+            "type": "object",
+            "properties": {}
+        }
+    }
+}

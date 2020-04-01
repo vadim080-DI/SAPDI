@@ -1,0 +1,27 @@
+{
+    "description": "Line Collector",
+    "component": "com.sap.system.python3Operator",
+    "inports": [
+        {
+            "name": "input",
+            "type": "message"
+        }
+    ],
+    "outports": [
+        {
+            "name": "output",
+            "type": "message"
+        }
+    ],
+    "icon": "stack-overflow",
+    "config": {
+        "$type": "http://sap.com/vflow/com.sap.datatools.line_collector.configSchema.json",
+        "encoding": "utf-8",
+        "final_condition": {
+            "storage.endOfFile": true,
+            "storage.endOfSequence": true
+        },
+        "num_lines": 10000,
+        "script": "file://chunk_to_csv.py"
+    }
+}

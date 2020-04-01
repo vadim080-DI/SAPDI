@@ -1,0 +1,397 @@
+{
+    "properties": {},
+    "description": "1. TechEd Dat649 Load Data to HANA",
+    "processes": {
+        "readfile2": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read product.csv",
+                "x": 17,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "/vrep/data/teched/product.csv",
+                    "onlyReadOnChange": false
+                }
+            }
+        },
+        "saphanaclient1": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 386.99999809265137,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    },
+                    "tableName": "${GroupID}.\"PRODUCT\"",
+                    "tableColumns": [
+                        {
+                            "name": "PRODUCTID",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "CATEGORY",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "CREATEDAT",
+                            "type": "DATE"
+                        },
+                        {
+                            "name": "CHANGEDAT",
+                            "type": "DATE"
+                        },
+                        {
+                            "name": "PRODUCTNAME",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "PRODUCTDESC",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "WEIGHTMEASURE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "PRICE",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "PRODUCTPICURL",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "WIDTH",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "DEPTH",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "HEIGHT",
+                            "type": "DOUBLE"
+                        }
+                    ],
+                    "lineDelimiter": "\\n",
+                    "insertMode": "INSERT",
+                    "initTable": "Truncate",
+                    "inputFormat": "CSV",
+                    "preparedStatements": [],
+                    "initStatements": "DROP TABLE ${GroupID}.\"PRODUCT\"; CREATE COLUMN TABLE ${GroupID}.\"PRODUCT\" (\"PRODUCTID\" NVARCHAR(100),      \"CATEGORY\" NVARCHAR(100),      \"CREATEDAT\" DATE,      \"CHANGEDAT\" DATE,      \"PRODUCTNAME\" NVARCHAR(100),      \"PRODUCTDESC\" NVARCHAR(255),      \"WEIGHTMEASURE\" DOUBLE,      \"PRICE\" DOUBLE,      \"PRODUCTPICURL\" NVARCHAR(255),      \"WIDTH\" DOUBLE,      \"DEPTH\" DOUBLE,      \"HEIGHT\" DOUBLE);"
+                }
+            }
+        },
+        "javascriptoperator21": {
+            "component": "com.sap.system.jsmengine",
+            "metadata": {
+                "label": "Format CSV",
+                "x": 201.99999904632568,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n\nfunction isByteArray(data) {\n    switch (Object.prototype.toString.call(data)) {\n        case \"[object Int8Array]\":\n        case \"[object Uint8Array]\":\n            return true;\n        case \"[object Array]\":\n        case \"[object GoArray]\":\n            return data.length > 0 && typeof data[0] === 'number';\n    }\n    return false;\n}\n\nfunction onInput(ctx,s) {\n    var msg = {};\n\n    var inbody = s.Body;\n    var inAttributes = s.Attributes;\n\n    // convert the body into string if it is bytes\n    if (isByteArray(inbody)) {\n        inbody = String.fromCharCode.apply(null, inbody);\n    }\n\n    var lines = inbody.split(\"\\n\");\n    \n    // Remove header line\n    lines.splice(0, 1);\n    \n    // Format columns \n    for (i=0;i<lines.length;i++) {\n        var line = lines[i].split(\",\");\n        var changeDat = line[2].split(\"/\");\n        var createDat = line[3].split(\"/\");\n        line[2] = \"20\" + changeDat[2] + \"-\" + changeDat[1] + \"-\" + changeDat[0];\n        line[3] = \"20\" + createDat[2] + \"-\" + createDat[1] + \"-\" + createDat[0];\n        lines[i] = line.join(\",\");\n    }\n    \n    msg.Body = lines.join(\"\\n\");\n    msg.Attributes = inAttributes;\n    \n    $.output(msg);\n}\n"
+                }
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read soitem.csv",
+                "x": 16.999999046325684,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "/vrep/data/teched/soItem.csv",
+                    "onlyReadOnChange": false
+                }
+            }
+        },
+        "saphanaclient2": {
+            "component": "com.sap.hana.client2",
+            "metadata": {
+                "label": "SAP HANA Client",
+                "x": 386.99999809265137,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "host",
+                            "password": "",
+                            "port": 9000,
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HANADB"
+                    },
+                    "tableName": "${GroupID}.\"SOITEM\"",
+                    "initTable": "Truncate",
+                    "lineDelimiter": "\\n",
+                    "inputFormat": "CSV",
+                    "tableColumns": [
+                        {
+                            "name": "SALESORDERID",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "SALESORDERITEM",
+                            "type": "INTEGER"
+                        },
+                        {
+                            "name": "PRODUCTID",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "GROSSAMOUNT",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "NETAMOUNT",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "TAXAMOUNT",
+                            "type": "DOUBLE"
+                        },
+                        {
+                            "name": "ITEMATPSTATUS",
+                            "type": "NVARCHAR"
+                        },
+                        {
+                            "name": "QUANTITY",
+                            "type": "INTEGER"
+                        },
+                        {
+                            "name": "DELIVERYDATE",
+                            "type": "DATE"
+                        }
+                    ],
+                    "initStatements": "DROP TABLE ${GroupID}.\"SOITEM\"; CREATE COLUMN TABLE ${GroupID}.\"SOITEM\" (\"SALESORDERID\" NVARCHAR(100),      \"SALESORDERITEM\" INTEGER,      \"PRODUCTID\" NVARCHAR(100),      \"GROSSAMOUNT\" DOUBLE,      \"NETAMOUNT\" DOUBLE,      \"TAXAMOUNT\" DOUBLE,      \"ITEMATPSTATUS\" NVARCHAR(100),      \"QUANTITY\" INTEGER,      \"DELIVERYDATE\" DATE);"
+                }
+            }
+        },
+        "blankjavascriptoperator1": {
+            "component": "com.sap.system.jsoperator",
+            "metadata": {
+                "label": "AND",
+                "x": 571.999997138977,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var counter = 0;\r\n\r\n$.setPortCallback(\"in1\",onInput);\r\n$.setPortCallback(\"in2\",onInput);\r\n\r\nfunction onInput(ctx,s) {\r\n    counter++;\r\n    if (counter==2) {\r\n        $.fire(\"done\");\r\n    }\r\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "in1",
+                        "type": "message"
+                    },
+                    {
+                        "name": "in2",
+                        "type": "message"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "fire",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "javascriptoperator22": {
+            "component": "com.sap.system.jsmengine",
+            "metadata": {
+                "label": "Format CSV",
+                "x": 201.99999904632568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n\nfunction isByteArray(data) {\n    switch (Object.prototype.toString.call(data)) {\n        case \"[object Int8Array]\":\n        case \"[object Uint8Array]\":\n            return true;\n        case \"[object Array]\":\n        case \"[object GoArray]\":\n            return data.length > 0 && typeof data[0] === 'number';\n    }\n    return false;\n}\n\nfunction onInput(ctx,s) {\n    var msg = {};\n\n    var inbody = s.Body;\n    var inAttributes = s.Attributes;\n\n    // convert the body into string if it is bytes\n    if (isByteArray(inbody)) {\n        inbody = String.fromCharCode.apply(null, inbody);\n    }\n\n    var lines = inbody.split(\"\\n\");\n    \n    // Remove header line\n    lines.splice(0, 1);\n\n    msg.Body = lines.join(\"\\n\");\n    msg.Attributes = inAttributes;\n    \n    $.output(msg);\n}\n"
+                }
+            }
+        },
+        "wixclient1": {
+            "component": "teched.dat649.wix_client",
+            "metadata": {
+                "label": "Just Started",
+                "x": 740.999997138977,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "group_id": "${GroupID}",
+                    "script": "$.addGenerator(init);\r\n$.addShutdownHandler(shutdown);\r\n$.setPortCallback(\"input\",onInput);\r\n\r\n// This example shows basic usage of a subgraph\r\n// It calls a subgraph with a parameter, provide input on an input port,\r\n// check output on an ouptput port and stop the subgraph\r\n\r\nvar graphName = \"teched.dat649.internal.wix_client_subgraph\";\r\nvar graphHandle;\r\nvar state = $.config.getString(\"state\");\r\nvar groupID = $.config.getString(\"group_id\");\r\n\r\nfunction init(ctx) {\r\n    // start subgraph\r\n    graphHandle = $.instantiateGraph(graphName,\r\n        {\"state\": state,\"groupid\": groupID},\r\n        // handle subgraph output port with name 'output'\r\n        {\"output\":function(ctx,s){\r\n            $.output(\"Result:\" + s);\r\n        }}\r\n  );\r\n}\r\n\r\nfunction shutdown(ctx) {\r\n    // stop subgraph\r\n    graphHandle.stop();\r\n}\r\n\r\nfunction onInput(ctx,input) {\r\n    // write string in subraph input port with name 'input'\r\n    graphHandle.input(input);\r\n    var block = true;\r\n    graphHandle.eventLoopIteration(block);\r\n}"
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 377,
+                "y": -106,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 921,
+                "y": -60,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "510.99999809265137,52 538.9999976158142,52 538.9999976158142,89 566.999997138977,89"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient2"
+            },
+            "tgt": {
+                "port": "in1",
+                "process": "blankjavascriptoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "510.99999809265137,172 538.9999976158142,172 538.9999976158142,121 566.999997138977,121"
+            },
+            "src": {
+                "port": "result",
+                "process": "saphanaclient1"
+            },
+            "tgt": {
+                "port": "in2",
+                "process": "blankjavascriptoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,61 168.99999952316284,61 168.99999952316284,52 196.99999904632568,52"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator22"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,52 353.9999985694885,52 353.9999985694885,61 381.99999809265137,61"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator22"
+            },
+            "tgt": {
+                "port": "data",
+                "process": "saphanaclient2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "695.999997138977,112 735.999997138977,112"
+            },
+            "src": {
+                "port": "fire",
+                "process": "blankjavascriptoperator1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "wixclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "864.999997138977,112 890.5,112 890.5,-20 916,-20"
+            },
+            "src": {
+                "port": "output",
+                "process": "wixclient1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,181 169,181 169,172 196.99999904632568,172"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile2"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator21"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,172 349,172 349,-66 372,-66"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator21"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "501,-66 551,-66 551,57.5 332,57.5 332,181 381.99999809265137,181"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "data",
+                "process": "saphanaclient1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

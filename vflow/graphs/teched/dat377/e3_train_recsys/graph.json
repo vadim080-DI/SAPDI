@@ -1,0 +1,94 @@
+{
+    "properties": {},
+    "description": "[DAT377] Train RecSys",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "path": "/DAT377/${USER}/export/",
+                    "pollPeriodInMs": "5000",
+                    "pattern": "json",
+                    "onlyReadOnChange": true,
+                    "service": "S3",
+                    "awsConnection": {
+                        "connectionProperties": {
+                            "accessKey": "AWSAccessKeyId",
+                            "awsProxy": "",
+                            "endpoint": "",
+                            "protocol": "HTTPS",
+                            "region": "eu-central-1",
+                            "rootPath": "",
+                            "secretKey": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "S3"
+                    },
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "messagetransform1": {
+            "component": "com.sap.datatools.messagetransform",
+            "metadata": {
+                "label": "Message Transform",
+                "x": 201.99999904632568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "\ndef on_input(msg):\n    body = msg.body\n    attr = msg.attributes\n    \n    dotrain = False\n    if msg.attributes[\"storage.endOfFile\"] and msg.attributes[\"storage.endOfSequence\"]:\n        dotrain = True\n    \n    attr.update({\"recsys.dotrain\": dotrain})\n    \n    api.send(\"output\", api.Message(body, attr))\n\napi.set_port_callback(\"input\", on_input)\n"
+                }
+            }
+        },
+        "wiretap2": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 370.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "141,61 168.99999952316284,61 168.99999952316284,52 196.99999904632568,52"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagetransform1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "325.9999990463257,52 365.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagetransform1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap2"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

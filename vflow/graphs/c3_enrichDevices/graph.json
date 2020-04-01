@@ -1,0 +1,695 @@
+{
+    "properties": {},
+    "description": "c3_enrichDevices",
+    "processes": {
+        "workflowtrigger1": {
+            "component": "com.sap.dh.trigger",
+            "metadata": {
+                "label": "Workflow Trigger",
+                "x": 295,
+                "y": 118,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "workflowterminator1": {
+            "component": "com.sap.dh.terminator",
+            "metadata": {
+                "label": "Workflow Terminator",
+                "x": 622,
+                "y": 138,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "datatransform1": {
+            "component": "com.sap.dh.datatransform",
+            "metadata": {
+                "label": "Data Transform",
+                "x": 464,
+                "y": 129,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "definition": {
+                        "nodeType": "ContainerNode",
+                        "inputs": [
+                            {
+                                "id": "87ec6e42-29e5-48f7-b9ad-99048a820ecf",
+                                "nodeType": "DataNode",
+                                "name": "DataSource1",
+                                "UILayout": {
+                                    "x": 152,
+                                    "y": 90,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "HDFS",
+                                            "type": "HDFS"
+                                        },
+                                        "name": "Customers.csv",
+                                        "remoteObjectType": "FILE.CSV",
+                                        "qualifiedName": "/exercises/customers.csv",
+                                        "nativeQualifiedName": "/exercises/customers.csv",
+                                        "owner": "hdfs",
+                                        "size": 7207,
+                                        "version": {
+                                            "dataLastModified": 1527504830000,
+                                            "metadataLastModified": 1527504830000,
+                                            "metadataVersionNumber": 1527504830000
+                                        }
+                                    },
+                                    "dataAccessConfiguration": {
+                                        "rowDelimiter": "\n",
+                                        "charset": "ISO-8859-1",
+                                        "escapeChar": "\\",
+                                        "textDelimiter": "\"",
+                                        "header": true,
+                                        "colDelimiter": ";"
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "e98517b0-c0ff-4883-9e0d-b5f7c4937380",
+                                        "name": "CUSTOMER",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "ef2599c2-16e0-4bc8-ba92-6a5d7dcf2979",
+                                        "name": "FIRST_NAME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 11
+                                    },
+                                    {
+                                        "id": "f52a6874-5781-45bb-a2ea-f15e3e54078b",
+                                        "name": "LAST_NAME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 12
+                                    },
+                                    {
+                                        "id": "06b8e05b-ab98-4ed9-9b87-80d937a90900",
+                                        "name": "COUNTRY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 2
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "01725a64-7d5d-4859-8a82-89226a616a83",
+                                "nodeType": "DataNode",
+                                "name": "DataSource2",
+                                "UILayout": {
+                                    "x": 178,
+                                    "y": 275,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "HDFS",
+                                            "type": "HDFS"
+                                        },
+                                        "name": "Devices.csv",
+                                        "remoteObjectType": "FILE.CSV",
+                                        "qualifiedName": "/exercises/devices.csv",
+                                        "nativeQualifiedName": "/exercises/devices.csv",
+                                        "owner": "hdfs",
+                                        "size": 20744,
+                                        "version": {
+                                            "dataLastModified": 1527504831000,
+                                            "metadataLastModified": 1527504831000,
+                                            "metadataVersionNumber": 1527504831000
+                                        }
+                                    },
+                                    "dataAccessConfiguration": {
+                                        "rowDelimiter": "\n",
+                                        "charset": "ISO-8859-2",
+                                        "escapeChar": "\\",
+                                        "textDelimiter": "\"",
+                                        "header": true,
+                                        "colDelimiter": ";"
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "0bc8e5eb-fdbd-4c36-b4a2-556b65c74528",
+                                        "name": "DEVICE",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 32
+                                    },
+                                    {
+                                        "id": "5105efdf-e4a5-4d09-ae20-bd48ac8a040a",
+                                        "name": "TYPE",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "f58cc2c5-7c4a-490b-a7fc-68f1d3042d08",
+                                        "name": "COUNTRY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 2
+                                    },
+                                    {
+                                        "id": "1f8f02d4-ecfa-4bae-8f1e-a3293f16ec16",
+                                        "name": "CUSTOMER",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "96fd8ff3-bae5-46b2-a39a-826fcd124a9f",
+                                        "name": "TIME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 27
+                                    }
+                                ]
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "id": "1b4491cc-656c-4042-996a-31bc6c5a3455",
+                                "nodeType": "DataNode",
+                                "name": "DataTarget1",
+                                "UILayout": {
+                                    "x": 934,
+                                    "y": 284,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "type": "HDFS",
+                                            "id": "HDFS"
+                                        },
+                                        "qualifiedName": "/exercises/solutions/EnrichedDevices.csv",
+                                        "remoteObjectType": "FILE.CSV"
+                                    },
+                                    "dataAccessConfiguration": {
+                                        "colDelimiter": ";",
+                                        "rowDelimiter": "\n",
+                                        "header": null,
+                                        "textDelimiter": "\"",
+                                        "escapeChar": null,
+                                        "charset": "ISO-8859-2"
+                                    },
+                                    "schema": {}
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "48ba826e-5077-477e-aaeb-2392a532ce15",
+                                        "name": "DEVICE",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 32
+                                    },
+                                    {
+                                        "id": "e1fc8e86-3d92-4522-9fe4-8aacd5a11db4",
+                                        "name": "TYPE",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 7
+                                    },
+                                    {
+                                        "id": "fbdb6c40-9481-4b1e-8641-8ef58c1ca56f",
+                                        "name": "CUSTOMER",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "a0815102-49a1-4a42-82e6-4ab3ec752535",
+                                        "name": "TIME",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 27
+                                    },
+                                    {
+                                        "id": "0c82a00b-34bc-4fc9-ab4b-5e143551d934",
+                                        "name": "COUNTRY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 2
+                                    }
+                                ],
+                                "mode": "OVERWRITE"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "id": "4433077e-05e5-487f-bceb-99c907530e8e",
+                                "type": "JoinNode",
+                                "nodeType": "JoinNode",
+                                "name": "Join1",
+                                "UILayout": {
+                                    "x": 437,
+                                    "y": 234,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "inputs": [
+                                    {
+                                        "id": "55ecff9c-4aee-42d1-bdc3-3aa9bc5a166b",
+                                        "name": "Join1_Input1",
+                                        "attributes": [
+                                            {
+                                                "id": "0db16a4b-0c2b-4065-9e1b-a2262685ac90",
+                                                "name": "CUSTOMER",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "06a62c2e-423c-4ebb-a22d-b7af0bdf73eb",
+                                                "name": "FIRST_NAME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 11
+                                            },
+                                            {
+                                                "id": "f7852ccc-db17-4023-b2a6-f74aae4a8dd0",
+                                                "name": "LAST_NAME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 12
+                                            },
+                                            {
+                                                "id": "b8be4d2e-7568-453f-9d42-0a6a40591c47",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 2
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": "36f5ad37-38df-4392-a19e-5c410411b1ca",
+                                        "name": "Join1_Input2",
+                                        "attributes": [
+                                            {
+                                                "id": "b8d72452-9563-42ec-941e-5a18c82a856f",
+                                                "name": "DEVICE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 32
+                                            },
+                                            {
+                                                "id": "bc1be813-fb96-4f3e-bdd0-72f5627b5735",
+                                                "name": "TYPE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "1c07390e-0f72-44ab-8999-9c619e19ee6a",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 2
+                                            },
+                                            {
+                                                "id": "4e7d96f5-a79f-4bba-b272-706cd83e5e2c",
+                                                "name": "CUSTOMER",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "1ec75115-eb29-4c08-ad62-14721da043d2",
+                                                "name": "TIME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 27
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "outputs": [
+                                    {
+                                        "id": "b98e2be3-fe2f-446c-892e-857c04664915",
+                                        "name": "Join1_Output1",
+                                        "attributes": [
+                                            {
+                                                "id": "5091de86-6ef3-4aac-a571-cddd3ae31fd1",
+                                                "name": "DEVICE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 32
+                                            },
+                                            {
+                                                "id": "5c3d987e-26bf-41de-9a03-df126266330e",
+                                                "name": "TYPE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "ab167ccb-050a-4e82-9832-225e8b769f1f",
+                                                "name": "CUSTOMER",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "2714847c-003e-48cb-a4bf-effd5238af90",
+                                                "name": "TIME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 27
+                                            },
+                                            {
+                                                "id": "cc27d475-6e24-436e-850f-cece9facd1d6",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 2
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "joinDefinitions": [
+                                    {
+                                        "left": "55ecff9c-4aee-42d1-bdc3-3aa9bc5a166b",
+                                        "right": "36f5ad37-38df-4392-a19e-5c410411b1ca",
+                                        "type": "INNER",
+                                        "condition": "\"Join1_Input1\".\"CUSTOMER\" = \"Join1_Input2\".\"CUSTOMER\""
+                                    }
+                                ],
+                                "tableMappings": [
+                                    {
+                                        "source": "36f5ad37-38df-4392-a19e-5c410411b1ca",
+                                        "target": "b98e2be3-fe2f-446c-892e-857c04664915",
+                                        "attributeMappings": [
+                                            {
+                                                "source": "b8d72452-9563-42ec-941e-5a18c82a856f",
+                                                "target": "5091de86-6ef3-4aac-a571-cddd3ae31fd1"
+                                            },
+                                            {
+                                                "source": "bc1be813-fb96-4f3e-bdd0-72f5627b5735",
+                                                "target": "5c3d987e-26bf-41de-9a03-df126266330e"
+                                            },
+                                            {
+                                                "source": "4e7d96f5-a79f-4bba-b272-706cd83e5e2c",
+                                                "target": "ab167ccb-050a-4e82-9832-225e8b769f1f"
+                                            },
+                                            {
+                                                "source": "1ec75115-eb29-4c08-ad62-14721da043d2",
+                                                "target": "2714847c-003e-48cb-a4bf-effd5238af90"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "source": "55ecff9c-4aee-42d1-bdc3-3aa9bc5a166b",
+                                        "target": "b98e2be3-fe2f-446c-892e-857c04664915",
+                                        "attributeMappings": [
+                                            {
+                                                "source": "b8be4d2e-7568-453f-9d42-0a6a40591c47",
+                                                "target": "cc27d475-6e24-436e-850f-cece9facd1d6"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "ce46aa6f-3d93-4a15-94ad-378814cce480",
+                                "type": "FilterNode",
+                                "nodeType": "FilterNode",
+                                "name": "Projection1",
+                                "UILayout": {
+                                    "x": 694,
+                                    "y": 236,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "inputs": [
+                                    {
+                                        "id": "62e38330-7ba6-4c0a-97fa-443094a51b5f",
+                                        "name": "Projection1_Input1",
+                                        "attributes": [
+                                            {
+                                                "id": "e582d47b-1442-46f4-a354-fa1ed901e24d",
+                                                "name": "DEVICE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 32
+                                            },
+                                            {
+                                                "id": "69e21e6d-e65c-4df5-9894-a5048beaf153",
+                                                "name": "TYPE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7
+                                            },
+                                            {
+                                                "id": "a2b2b614-b52b-4797-b687-e48bbc2e9118",
+                                                "name": "CUSTOMER",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "11e838b3-01e9-408f-8829-b3247a2a437b",
+                                                "name": "TIME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 27
+                                            },
+                                            {
+                                                "id": "f382163a-ca4c-47e3-9ee4-a8148a9a76b1",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 2
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "outputs": [
+                                    {
+                                        "id": "28b6c54f-e396-40e7-bb4c-ddb652968075",
+                                        "name": "Projection1_Output1",
+                                        "attributes": [
+                                            {
+                                                "id": "442be652-8cc6-4f1e-b491-ac1eda64fad9",
+                                                "name": "DEVICE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 32,
+                                                "expression": "\"DEVICE\""
+                                            },
+                                            {
+                                                "id": "4e6c86c8-96d3-481d-b664-c0ffe498b92b",
+                                                "name": "TYPE",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 7,
+                                                "expression": "\"TYPE\""
+                                            },
+                                            {
+                                                "id": "07536d96-03a1-4902-a379-bd1e8f249b7b",
+                                                "name": "CUSTOMER",
+                                                "datatype": "INTEGER",
+                                                "nullable": false,
+                                                "expression": "\"CUSTOMER\""
+                                            },
+                                            {
+                                                "id": "2c6a4db3-3ac4-4b3b-bd7d-9129d7338967",
+                                                "name": "TIME",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 27,
+                                                "expression": "\"TIME\""
+                                            },
+                                            {
+                                                "id": "7e3430b5-b0e9-42e2-ad2e-0e5c30d03d83",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 2,
+                                                "expression": "\"COUNTRY\""
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "tableMappings": [
+                            {
+                                "source": "87ec6e42-29e5-48f7-b9ad-99048a820ecf",
+                                "target": "55ecff9c-4aee-42d1-bdc3-3aa9bc5a166b",
+                                "UILayout": {
+                                    "points": "272,130 354.4364929199219,130 354.4364929199219,265 437,265"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "e98517b0-c0ff-4883-9e0d-b5f7c4937380",
+                                        "target": "0db16a4b-0c2b-4065-9e1b-a2262685ac90"
+                                    },
+                                    {
+                                        "source": "ef2599c2-16e0-4bc8-ba92-6a5d7dcf2979",
+                                        "target": "06a62c2e-423c-4ebb-a22d-b7af0bdf73eb"
+                                    },
+                                    {
+                                        "source": "f52a6874-5781-45bb-a2ea-f15e3e54078b",
+                                        "target": "f7852ccc-db17-4023-b2a6-f74aae4a8dd0"
+                                    },
+                                    {
+                                        "source": "06b8e05b-ab98-4ed9-9b87-80d937a90900",
+                                        "target": "b8be4d2e-7568-453f-9d42-0a6a40591c47"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "01725a64-7d5d-4859-8a82-89226a616a83",
+                                "target": "36f5ad37-38df-4392-a19e-5c410411b1ca",
+                                "UILayout": {
+                                    "points": "298,315 367.4364929199219,315 367.4364929199219,283 437,283"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "0bc8e5eb-fdbd-4c36-b4a2-556b65c74528",
+                                        "target": "b8d72452-9563-42ec-941e-5a18c82a856f"
+                                    },
+                                    {
+                                        "source": "5105efdf-e4a5-4d09-ae20-bd48ac8a040a",
+                                        "target": "bc1be813-fb96-4f3e-bdd0-72f5627b5735"
+                                    },
+                                    {
+                                        "source": "f58cc2c5-7c4a-490b-a7fc-68f1d3042d08",
+                                        "target": "1c07390e-0f72-44ab-8999-9c619e19ee6a"
+                                    },
+                                    {
+                                        "source": "1f8f02d4-ecfa-4bae-8f1e-a3293f16ec16",
+                                        "target": "4e7d96f5-a79f-4bba-b272-706cd83e5e2c"
+                                    },
+                                    {
+                                        "source": "96fd8ff3-bae5-46b2-a39a-826fcd124a9f",
+                                        "target": "1ec75115-eb29-4c08-ad62-14721da043d2"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "b98e2be3-fe2f-446c-892e-857c04664915",
+                                "target": "62e38330-7ba6-4c0a-97fa-443094a51b5f",
+                                "UILayout": {
+                                    "points": "557,275 694,275"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "5091de86-6ef3-4aac-a571-cddd3ae31fd1",
+                                        "target": "e582d47b-1442-46f4-a354-fa1ed901e24d"
+                                    },
+                                    {
+                                        "source": "5c3d987e-26bf-41de-9a03-df126266330e",
+                                        "target": "69e21e6d-e65c-4df5-9894-a5048beaf153"
+                                    },
+                                    {
+                                        "source": "ab167ccb-050a-4e82-9832-225e8b769f1f",
+                                        "target": "a2b2b614-b52b-4797-b687-e48bbc2e9118"
+                                    },
+                                    {
+                                        "source": "2714847c-003e-48cb-a4bf-effd5238af90",
+                                        "target": "11e838b3-01e9-408f-8829-b3247a2a437b"
+                                    },
+                                    {
+                                        "source": "cc27d475-6e24-436e-850f-cece9facd1d6",
+                                        "target": "f382163a-ca4c-47e3-9ee4-a8148a9a76b1"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "28b6c54f-e396-40e7-bb4c-ddb652968075",
+                                "target": "1b4491cc-656c-4042-996a-31bc6c5a3455",
+                                "UILayout": {
+                                    "points": "814,276 873.9365234375,276 873.9365234375,324 934,324"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "442be652-8cc6-4f1e-b491-ac1eda64fad9",
+                                        "target": "48ba826e-5077-477e-aaeb-2392a532ce15"
+                                    },
+                                    {
+                                        "source": "4e6c86c8-96d3-481d-b664-c0ffe498b92b",
+                                        "target": "e1fc8e86-3d92-4522-9fe4-8aacd5a11db4"
+                                    },
+                                    {
+                                        "source": "07536d96-03a1-4902-a379-bd1e8f249b7b",
+                                        "target": "fbdb6c40-9481-4b1e-8641-8ef58c1ca56f"
+                                    },
+                                    {
+                                        "source": "2c6a4db3-3ac4-4b3b-bd7d-9129d7338967",
+                                        "target": "a0815102-49a1-4a42-82e6-4ab3ec752535"
+                                    },
+                                    {
+                                        "source": "7e3430b5-b0e9-42e2-ad2e-0e5c30d03d83",
+                                        "target": "0c82a00b-34bc-4fc9-ab4b-5e143551d934"
+                                    }
+                                ]
+                            }
+                        ],
+                        "invalidMappings": []
+                    }
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "419,158 439.5,158 439.5,169 460,169"
+            },
+            "src": {
+                "port": "output",
+                "process": "workflowtrigger1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "datatransform1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "588,160 603,160 603,178 618,178"
+            },
+            "src": {
+                "port": "output",
+                "process": "datatransform1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "workflowterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

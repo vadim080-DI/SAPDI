@@ -1,0 +1,458 @@
+{
+    "properties": {},
+    "iconsrc": "",
+    "icon": "file-text-o",
+    "description": "Copy of Text Analysis HDFS",
+    "processes": {
+        "experimentaltextanalysistaconnector1": {
+            "component": "com.sap.textanalysis.taconnector",
+            "metadata": {
+                "label": "Text Analysis",
+                "x": 1209.9999952316284,
+                "y": 57.50000023841858,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "CmdLine": "/project/textanalysis/bin/v2textanalysis_vflow",
+                    "TraceStderr": true,
+                    "Env": []
+                }
+            }
+        },
+        "javascriptoperator1": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "SQL Creator",
+                "x": 501.99999713897705,
+                "y": 57.50000023841858,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\nvar rootreq = true;\nvar schemaname = \"\";\nvar sqltablename = \"\";\nfunction onInput(ctx,s) {\n    var reqarray = s.split(\"\\n\");\n    var rootinput = reqarray[0].split(\",\");\n    var modinput = reqarray[1].split(\",\");\n    var rootfolderpath = rootinput[0];\n    var folderpath = modinput[0];\n    var recflag = modinput[1];\n    var sqlstatement;\n    if (rootreq)\n    {\n      schemaname = rootinput[1].slice(0,-1);\n      sqltablename = \"TADOC_\" + rootinput[2];\n      if (schemaname)\n      {\n        sqlstatement = \"Select '\" + rootreq + \"' as rootreqflag, 'true' as schemacheck, '\" + folderpath + \"' as folderpath, '\" + recflag +\"' as recflag, count(*) as tablecount from sys.tables where schema_name = '\" + schemaname.toUpperCase() +  \"' and table_name = '\" + sqltablename.toUpperCase() + \"';\";\n        sqlstatement += \"Select count(*) as schemacount from sys.schemas where schema_name = '\" + schemaname.toUpperCase() +  \"';\";\n      }\n      else\n      {\n        sqlstatement = \"Select '\" + rootreq + \"' as rootreqflag, 'false' as schemacheck, '\" + folderpath + \"' as folderpath, '\" + recflag +\"' as recflag, count(*) as tablecount from sys.tables where schema_name = 'VORA' and table_name = '\" + sqltablename.toUpperCase() + \"';\";\n      }\n    }\n    else\n    {\n        var dot = schemaname ? \".\" : \"\";\n        sqlstatement = \"Select '\" + rootreq + \"' as rootreqflag, '\" + folderpath + \"' as folderpath, '\" + recflag +\"' as recflag, max(DOC_ID) as doc_id from \" + schemaname + dot + sqltablename + \";\";\n    }\n    console.log(\"SQL Creator output:\\n\" + sqlstatement+ \"\\n\");\n    $.output(sqlstatement);\n    if (rootreq)\n    {\n        rootreq = false;\n    }\n}"
+                }
+            }
+        },
+        "javascriptoperator2": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "Response Parser",
+                "x": 855.9999961853027,
+                "y": 57.50000023841858,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n$.setPortCallback(\"input2\",onInput2);\nvar globalfolderpath, globalrecflag, globalcreateschema;\n\nfunction onInput(ctx,s) {\n    $.fail(\"This port should not be used\");\n}\n\nfunction onInput2(ctx,s) {\n    var data = s.Body;\n    var folderpath, recflag, rootreqflag;\n\tvar doc_id = 0;\n    if (typeof data[0].SCHEMACOUNT != 'undefined')\n    {\n        \n        var schemacount = data[0].SCHEMACOUNT;\n        console.log(\"trysend schemacount \" + schemacount );\n        if (schemacount !== 0)\n        {\n            globalcreateschema = \"false\";\n        }\n        else\n        {\n            globalcreateschema = \"true\";\n        }\n        trysend();\n    }\n    else\n    {\n\t    rootreqflag = data[0].ROOTREQFLAG;\n\t    console.log(\"Rootreqflag: \" + rootreqflag);\n\t    if (rootreqflag === \"true\")\n\t    {\n\t        var tablecount = data[0].TABLECOUNT;\n\t        console.log(\"tablecount \" + tablecount );\n\t        folderpath = data[0].FOLDERPATH;\n    \t\trecflag = data[0].RECFLAG;\n\t        if (tablecount !== 0)\n\t        {\n    \t        console.log(\"Response parser:\\nTable already exists, please enter a new name\"+ \"\\n\");\n    \t\t\t$.fail(\"Table already exists, please enter a new name\");\n\t        }\n\t        else\n\t        {\n\t            if (data[0].SCHEMACHECK === \"false\")\n\t            {\n\t                $.output(folderpath + \",\" + recflag + \",\" + doc_id + \",false\");\n\t            }\n\t            else\n\t            {\n\t              globalfolderpath = folderpath;\n\t              globalrecflag = recflag;\n                  trysend();\n\t            }\n\t            \n\t        }\n\t    }\n\t    else\n\t    {\n\t        folderpath = data[0].FOLDERPATH;\n    \t\trecflag = data[0].RECFLAG;\n\t        doc_id = data[0].DOC_ID + 1;\n\t        console.log(\"Response parser:\\n\" + folderpath + \",\" + recflag + \",\" + doc_id + \"\\n\");\n\t        $.output(folderpath + \",\" + recflag + \",\" + doc_id);\n\t    }       \n        \n    }\n}\n\nfunction trysend()\n{\n    console.log(\"Try send\");\n    if ((typeof globalrecflag != 'undefined') && globalfolderpath && (typeof globalcreateschema != 'undefined'))\n    {\n        console.log(\"Trysend Response parser:\\n\" + globalfolderpath + \",\" + globalrecflag + \",0,\" + globalcreateschema + \"\\n\");\n        $.output(globalfolderpath + \",\" + globalrecflag + \",\" + 0 + \",\" + globalcreateschema);\n    }\n}"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input2",
+                        "type": "message"
+                    }
+                ]
+            }
+        },
+        "javascriptoperator3": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "TA Response Parser",
+                "x": 1394.999994277954,
+                "y": 57.50000023841858,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var reqarray = s.split(\"\\n\");\n    var request = JSON.parse(reqarray[0]);\n    var response = reqarray[1];\n    if (response)\n    {\n        if (response > 0)\n        {\n            var olddoc_ids = reqarray[2].split(\",\");\n            olddoc_ids.splice(0,1);\n            console.log( \"TA Response Parser:\\n\" + request.folderpath + \",\" + request.recursive_flag + \",\" + request.taconfig + \"\\n\" + olddoc_ids + \"\\n\");\n            $.output( request.folderpath + \",\" + request.recursive_flag + \",\" + request.taconfig + \",\" + request.createschema + \"\\n\" + olddoc_ids );\n        }\n        console.log(\"Number of Tokenized documents: \" + response);\n    }\n    else\n    {\n        console.log(response);\n        console.log(\"TA Response Parser:\\nTextanalysis server at '\" + request.endpoint +\"' is down or could not process the request.\");\n        $.fail(\"Text analysis server at '\" + request.endpoint +\"' is down or could not process the request.\");\n    }\n    \n}"
+                }
+            }
+        },
+        "javascriptoperator4": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "TA Request Creator",
+                "x": 1024.9999961853027,
+                "y": 57.50000023841858,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var serverendpoints = $.config.getString(\"serverendpoints\");\nvar taconfig = $.config.getString(\"taconfig\");\nvar serverendpointsarr = serverendpoints.split(\",\");\nvar languages = $.config.getString(\"languages\");\nvar mime_type = $.config.getString(\"mimetype\");\nvar encoding = $.config.getString(\"encoding\");\nvar maxdoc_id = -1;\n$.setPortCallback(\"input\",onInput);\n\nfunction onInput(ctx,s) {\n    var randomendpoint = serverendpointsarr[Math.floor(Math.random() * serverendpointsarr.length)];\n    var tareq = {};   \n    var request = s.split(\",\");\n    tareq.folderpath = request[0];\n    tareq.recursive_flag = request[1];\n    if (maxdoc_id == request[2])\n    {\n        maxdoc_id = parseInt(request[2]) + 1;\n    }\n    else\n    {\n        maxdoc_id = parseInt(request[2]);\n    }\n    tareq.createschema = request[3];\n    tareq.document_id = maxdoc_id;\n    tareq.endpoint = randomendpoint;\n    tareq.taconfig = taconfig;\n    tareq.languages = languages;\n    tareq.mime_type = mime_type;\n    tareq.text_encoding = encoding;\n    var serializedreq = JSON.stringify(tareq);\n    console.log(\"TA Request Creator:\\n\" + serializedreq+ \"\\n\");\n    $.output(serializedreq);\n}",
+                    "serverendpoints": "vora-textanalysis.vora23:10002",
+                    "taconfig": "EXTRACTION_CORE_VOICEOFCUSTOMER",
+                    "languages": "",
+                    "mimetype": "",
+                    "encoding": ""
+                }
+            }
+        },
+        "javascriptoperator5": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "Modification Checker",
+                "x": 316.99999809265137,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var files = [];\r\nvar folders = [];\r\nvar request = [];\r\nvar deleterequest = [];\r\n\r\nvar schemaname = $.config.getString(\"schemaname\");\r\nif (schemaname)\r\n{\r\n    schemaname+=\".\";\r\n}\r\nvar hadoopnamenode = $.config.getString(\"hadoopnamenode\");\r\nvar rootfolder = \"hdfs://\" + hadoopnamenode + $.config.getString(\"folderpath\");\r\nvar tablenamesuffix = $.config.getString(\"tablenamesuffix\");\r\nvar rootreqflag = true;\r\n\r\n$.addTimer($.config.getString(\"duration\"), tick);\r\n$.setPortCallback(\"input\",onIn1);\r\n$.setPortCallback(\"input2\",onIn2);\r\n\r\nfunction tick(ctx)\r\n{\r\n    tick1();\r\n    tick2();\r\n}\r\n\r\nfunction tick1(ctx)\r\n{\r\n    var recursive = true;\r\n    var output = \"\";\r\n    var i;\r\n    var parentfolder = \"\";\r\n    if (rootreqflag)\r\n    {\r\n        for (i=0;i<request.length;i++)\r\n        {\r\n            files.push(request[i]);\r\n            parentfolder=getparentfolder(request[i]);\r\n            if (folders.indexOf(parentfolder) == -1)\r\n            {\r\n                folders.push(parentfolder);\r\n            }\r\n        }\r\n        if (!tablenamesuffix)\r\n        {\r\n            tablenamesuffix = rootfolder.substring(rootfolder.lastIndexOf(\"/\")+1);\r\n        }\r\n        output = rootfolder + \",\" + schemaname + \",\" + tablenamesuffix + \"\\n\" + rootfolder + \",\" + recursive;\r\n        rootreqflag = false;\r\n        $.output(output);\r\n        $.output2( \"init\\n\" + schemaname + \",\" + tablenamesuffix + \"\\n\" + folders);\r\n        console.log(\"Modification Checker output:\\n\" + output+ \"\\n\");\r\n        console.log(\"Modification Checker output2:\\n\" + \"init\\n\" + tablenamesuffix + \"\\n\" + folders + \"\\n\");\r\n    }\r\n    else\r\n    {\r\n        // fill reclist and nonreclist according to existence in folders\r\n        var reclist = [];\r\n        var nonreclist = [];\r\n        var foldersadded = false;\r\n        for (i=0;i<request.length;i++)\r\n        {\r\n            if (files.indexOf(request[i]) == -1)\r\n            {\r\n                files.push(request[i]);    \r\n            }\r\n            parentfolder=getparentfolder(request[i]);\r\n            if (folders.indexOf(parentfolder) == -1)\r\n            {\r\n                foldersadded = true;\r\n                folders.push(parentfolder);\r\n                reclist.push(parentfolder);\r\n            }\r\n            else\r\n            {\r\n                if (nonreclist.indexOf(parentfolder) == -1)\r\n                {\r\n                    nonreclist.push(parentfolder);\r\n                }\r\n            }\r\n        }\r\n        if (foldersadded)\r\n        {\r\n            console.log(\"Modification Checker output2:\\n\" + \"update\\n\" + reclist+ \"\\n\");\r\n            $.output2( \"update\\n\" + reclist);\r\n        }\r\n        //filter the reclist array to remove child nodes\r\n        var ignoredfolders = [];\r\n        for (var j=0;j<reclist.length;j++)\r\n        {\r\n            var k;\r\n            for (k=0;k<reclist.length;k++)\r\n            {\r\n                if (j != k)\r\n                {\r\n                    //check if a parent exists in the list\r\n                    if (reclist[j].indexOf(reclist[k]) !== -1)\r\n                    {\r\n                        ignoredfolders.push(j);\r\n                        break;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        var m;\r\n        for (m=0;m<reclist.length;m++)\r\n        {\r\n            if (ignoredfolders.indexOf(m) == -1)\r\n            {\r\n            output = rootfolder + \",\" + tablenamesuffix + \"\\n\" + reclist[m] + \",\" + recursive;\r\n            $.output(output);\r\n            console.log(\"Modification Checker output:\\n\" + output+ \"\\n\");\r\n            }\r\n        }\r\n        \r\n        //send non recursive requests one by one\r\n        var n;\r\n        for (n=0;n<nonreclist.length;n++)\r\n        {\r\n            output = rootfolder + \",\" + tablenamesuffix + \"\\n\" + nonreclist[n] + \",\" + !recursive;\r\n            $.output(output);\r\n            console.log(\"Modification Checker output:\\n\" + output+ \"\\n\");\r\n        }\r\n    }\r\n    request = [];\r\n}\r\n\r\nfunction tick2(ctx)\r\n{\r\n   var foldersreq = [];\r\n   if (deleterequest.length > 0)\r\n   {\r\n       //logic for extracting folders to be deleted\r\n       var i;\r\n       for (i=0;i<deleterequest.length;i++)\r\n       {\r\n           var parentfolder=getparentfolder(deleterequest[i]);\r\n           if (foldersreq.indexOf(parentfolder) == -1)\r\n           {\r\n               foldersreq.push(parentfolder);\r\n           }\r\n       }\r\n       //logic for sending the deleted folders to be removed from the database\r\n       var foldeletedflag=false;\r\n       var output = foldersreq + \"\\n\";\r\n       var deletefolders = [];\r\n       var j;\r\n       for (j=0;j<folders.length;j++)\r\n       {\r\n           if (foldersreq.indexOf(folders[j]) == -1)\r\n           {\r\n              foldeletedflag = true;\r\n              deletefolders.push(folders[j]);\r\n              output += folders[j] + \"\\n\";\r\n           }\r\n       }\r\n       if (foldeletedflag)\r\n       {\r\n           $.output2(\"delete\\n\" + output);\r\n           console.log(\"Modification Checker output2:\\n\" + \"delete\\n\" + output+ \"\\n\");\r\n       }\r\n       //logic for sending non recursive requests for deleted files\r\n       var outputarr = [];\r\n       var k;\r\n       for (k=0;k<files.length;k++)\r\n       {\r\n           if (files[k] !== undefined && deleterequest.indexOf(files[k]) == -1)\r\n           {\r\n               var parent = getparentfolder(files[k]);\r\n               if (deletefolders.indexOf(parent) == -1)\r\n               {\r\n                   if (outputarr.indexOf(parent) == -1)\r\n                   {\r\n                      outputarr.push(parent);\r\n                      output = rootfolder + \",\" + tablenamesuffix + \"\\n\" + parent + \",false\";\r\n                      console.log(\"Modification Checker output:\\n\" + output + \"\\n\");\r\n                      $.output(output);\r\n                      \r\n                   }\r\n               }\r\n           }\r\n       }\r\n    }\r\n    folders = foldersreq;\r\n    files = deleterequest;\r\n    deleterequest = [];\r\n}\r\n\r\nfunction onIn1(ctx,s)\r\n{\r\n    var fullpath = \"hdfs://\" + hadoopnamenode + s;\r\n    if (fullpath.indexOf(\"_TA.csv\") === -1 && fullpath.indexOf(\"_TADOC.csv\") === -1 && request.indexOf(fullpath) == -1)\r\n    {\r\n     request.push(fullpath);   \r\n    }\r\n}\r\n\r\nfunction onIn2(ctx,s)\r\n{\r\n    var fullpath = \"hdfs://\" + hadoopnamenode + s;\r\n    if (deleterequest.indexOf(fullpath) == -1 && fullpath.indexOf(\"_TA.csv\") === -1 && fullpath.indexOf(\"_TADOC.csv\") === -1)\r\n    {\r\n        {\r\n            deleterequest.push(fullpath);    \r\n        }\r\n        \r\n    }\r\n}\r\n\r\n\r\nfunction getparentfolder(filename)\r\n{\r\n    return filename.slice(0,filename.lastIndexOf(\"/\"));\r\n}",
+                    "folderpath": "/DAT263/reviews/",
+                    "schemaname": "DAT263",
+                    "tablenamesuffix": "reviews",
+                    "duration": "7s",
+                    "hadoopnamenode": "xsahana.sap.com:8020"
+                },
+                "additionalinports": [
+                    {
+                        "name": "input2",
+                        "type": "string"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "output2",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "javascriptoperator6": {
+            "component": "com.sap.system.jsengine",
+            "metadata": {
+                "label": "SQL Creator",
+                "x": 1579.9999933242798,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "var schemaname = \"\";\r\nvar foldercount = {};\r\nvar folders = [];\r\nvar tablenamesuffix = \"\";\r\nvar tatablename = \"\";\r\nvar tadoctablename = \"\";\r\nvar datasources = {};\r\nvar ds_counter = 1;\r\nvar root = true;\r\nvar columns = \"\";\r\nvar createindexflag = $.config.getBool(\"createindex\");\r\n\r\n$.setPortCallback(\"input\",onIn1);\r\n$.setPortCallback(\"input2\",onIn2);\r\n\r\nfunction onIn1(ctx,s) {\r\n\tvar reqarray=s.split(\"\\n\");\r\n    var request=reqarray[0].split(\",\");\r\n    var folderpath = request[0];\r\n\tvar recursive = request[1];\r\n\tvar taconfig = request[2];\r\n\tvar createschema = request[3];\r\n\tvar sqloutput = \"\";\r\n\tif  (root)\r\n\t{\r\n\t    columns = \"DOC_ID INTEGER, TA_RULE VARCHAR(*), TA_COUNTER BIGINT, TA_TOKEN VARCHAR(*),TA_LANGUAGE VARCHAR(*), TA_TYPE VARCHAR(*),TA_NORMALIZED VARCHAR(*),TA_STEM VARCHAR(*), TA_PARAGRAPH INTEGER, TA_SENTENCE INTEGER, TA_OFFSET BIGINT, TA_LENGTH INTEGER, TA_PARENT BIGINT\";\r\n\t\tvar createschemasql = \"\";\r\n\t\tif (schemaname)\r\n\t\t{\r\n\t\t    if (createschema == \"true\")\r\n\t\t    {\r\n\t\t        createschemasql = \"CREATE SCHEMA \" + schemaname.slice(0, -1) + \";\";    \r\n\t\t    }\r\n\t\t}\r\n\t\tvar partitionfunctionsql = \"CREATE PARTITION FUNCTION \" + schemaname + \"PF_TEXTANALYSIS_\" + tablenamesuffix +\" ( c INTEGER ) AS HASH(c) MIN PARTITIONS 1 MAX PARTITIONS 8;\";\r\n\t\tvar partitionschemesql = \"CREATE PARTITION SCHEME \" + schemaname + \"PS_\" + tablenamesuffix + \" USING \" + schemaname + \"PF_TEXTANALYSIS_\" + tablenamesuffix + \";\";\r\n\t\tvar mempartitionschemesql = \"CREATE PARTITION SCHEME \" + schemaname + \"PS_\" + tablenamesuffix + \"_mem USING \" + schemaname + \"PF_TEXTANALYSIS_\" + tablenamesuffix + \" WITH COLOCATION;\";\r\n\t\tvar createtatablesql = \"CREATE TABLE \" + schemaname  + tatablename + \" (\" + columns +\") STORE ON DISK TYPE DATASOURCE PARTITION BY \" + schemaname + \"PS_\" + tablenamesuffix + \"(DOC_ID);\";\r\n\t\tvar createtadoctablesql = \"CREATE TABLE \" + schemaname  + tadoctablename + \" (DOC_ID INTEGER, FILENAME VARCHAR(*)) STORE ON DISK TYPE DATASOURCE PARTITION BY \" + schemaname + \"PS_\" + tablenamesuffix + \"(DOC_ID);\";\r\n\t\tvar creatememtatablesql = \"CREATE TABLE \" + schemaname  + tatablename + \"_mem (DOC_ID INTEGER, TA_TOKEN VARCHAR(*), TA_NORMALIZED VARCHAR(*)) STORE IN MEMORY TYPE DATASOURCE PARTITION BY \" + schemaname + \"PS_\" + tablenamesuffix + \"_mem(DOC_ID);\";\r\n\t\tvar creatememtadoctablesql = \"CREATE TABLE \" + schemaname  + tadoctablename + \"_mem (DOC_ID INTEGER, FILENAME VARCHAR(*)) STORE IN MEMORY TYPE DATASOURCE PARTITION BY \" + schemaname + \"PS_\" + tablenamesuffix + \"_mem(DOC_ID);\";\r\n\t\tsqloutput += createschemasql + partitionfunctionsql + partitionschemesql + mempartitionschemesql + createtatablesql + createtadoctablesql; \r\n\t\tif (createindexflag)\r\n\t\t{\r\n\t\t  sqloutput += creatememtatablesql + creatememtadoctablesql;\r\n\t\t}\r\n\t}    \r\n    var altertablesql = \"\";\r\n    var ds_ta;\r\n    var ds_tadoc;\r\n\tif (recursive == \"true\")\r\n\t{\r\n\t\tvar csvfiles = getsubfolderscsv(folderpath);\r\n\t\tvar i;\r\n\t\tfor (i=0;i<csvfiles.length;i++)\r\n\t\t{\r\n\t\t    datasources[csvfiles[i] + \"_TA.csv\"] = ds_counter++;\r\n\t\t    datasources[csvfiles[i] + \"_TADOC.csv\"] = ds_counter++;\r\n\t\t    ds_ta = \"ds\" + datasources[csvfiles[i] + \"_TA.csv\"];\r\n\t\t    ds_tadoc = \"ds\" + datasources[csvfiles[i] + \"_TADOC.csv\"];\r\n\t\t\taltertablesql += \"ALTER TABLE \" + schemaname + tatablename + \" ADD DATASOURCE AS \" + ds_ta + \" hdfs('\" + csvfiles[i] + \"_TA.csv') DELIMITED BY ',' skip 1;\";\r\n\t\t\taltertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \" ADD DATASOURCE AS \" + ds_tadoc + \" hdfs('\" + csvfiles[i] + \"_TADOC.csv') DELIMITED BY ',' skip 1;\";\t\t\r\n\t\t}\r\n\t}\r\n\telse\r\n\t{\r\n\t    ds_ta =\t\"ds\" + datasources[getcsvfilename(folderpath) + \"_TA.csv\"];\r\n\t\tds_tadoc = \"ds\" + datasources[getcsvfilename(folderpath) + \"_TADOC.csv\"];\r\n\t\taltertablesql += \"ALTER TABLE \" + schemaname + tatablename + \" DROP DATASOURCE \" + ds_ta + \";\";\r\n\t\taltertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \" DROP DATASOURCE \" + ds_tadoc + \";\";\r\n\t\t\r\n\t\tdatasources[getcsvfilename(folderpath) + \"_TA.csv\"] = ds_counter++;\r\n\t\tdatasources[getcsvfilename(folderpath) + \"_TADOC.csv\"] = ds_counter++;\r\n\t\tds_ta =\t\"ds\" + datasources[getcsvfilename(folderpath) + \"_TA.csv\"];\r\n\t\tds_tadoc = \"ds\" + datasources[getcsvfilename(folderpath) + \"_TADOC.csv\"];\r\n\t\t\r\n\t\taltertablesql += \"ALTER TABLE \" + schemaname + tatablename + \" ADD DATASOURCE AS \" + ds_ta +\" hdfs('\" + getcsvfilename(folderpath) + \"_TA.csv') DELIMITED BY ',' skip 1;\";\r\n\t\taltertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \" ADD DATASOURCE AS \" + ds_tadoc +\" hdfs('\" + getcsvfilename(folderpath) + \"_TADOC.csv') DELIMITED BY ',' skip 1;\";\r\n\t}\r\n\tif (createindexflag)\r\n    {\r\n    \t//Drop All in memory datasources\r\n    \tvar droptads_sql = \"ALTER TABLE \" + schemaname + tatablename + \"_mem DROP DATASOURCE ALL;\";\r\n    \tvar droptadocds_sql = \"ALTER TABLE \" + schemaname + tadoctablename + \"_mem DROP DATASOURCE ALL;\";\r\n    \tvar loadtamemsql = \"LOAD TABLE \" + schemaname + tatablename + \"_mem;\";\r\n        var loadtadocmemsql = \"LOAD TABLE \" + schemaname + tadoctablename + \"_mem;\";\r\n    \tvar dropindex_sql = \"DROP FULLTEXT INDEX \" + schemaname + tadoctablename +  \"_idx;\";\r\n        sqloutput += droptads_sql;\r\n    \tsqloutput += droptadocds_sql;\r\n    \tsqloutput += loadtamemsql;\r\n    \tsqloutput += loadtadocmemsql;\r\n    \tif (!root)\r\n    \t{\r\n    \t sqloutput += dropindex_sql;   \r\n    \t}\r\n    \tvar altertamemsql = \"\";\r\n    \tvar altertadocmemsql = \"\";\r\n    \tvar j;\r\n    \tfor (j=0;j<folders.length;j++)\r\n    \t{\r\n    \t    altertamemsql += \"ALTER TABLE \" + schemaname + tatablename + \"_mem ADD DATASOURCE (DOC_ID as $1, TA_TOKEN AS $4, TA_NORMALIZED AS $7) hdfs('\" + getcsvfilename(folders[j]) + \"_TA.csv') DELIMITED BY ',' skip 1;\";\r\n    \t    altertadocmemsql += \"ALTER TABLE \" + schemaname + tadoctablename + \"_mem ADD DATASOURCE hdfs('\" + getcsvfilename(folders[j]) + \"_TADOC.csv') DELIMITED BY ',' skip 1;\";\r\n    \t}\r\n    \taltertablesql += altertamemsql + altertadocmemsql;\r\n    }\r\n    // Add the datasources for both disk and relational engine and reload all tables\r\n    if (altertablesql)\r\n    {\r\n        sqloutput += altertablesql;\r\n\t\tvar loaddisksql = \"LOAD TABLE \" + schemaname + tatablename + \";\";\r\n\t\tloaddisksql += \"LOAD TABLE \" + schemaname + tadoctablename + \";\";\r\n        sqloutput += loaddisksql;\r\n        if (createindexflag)\r\n        {\r\n        \tvar loadtamemsql = \"LOAD TABLE \" + schemaname + tatablename + \"_mem;\";\r\n            var loadtadocmemsql = \"LOAD TABLE \" + schemaname + tadoctablename + \"_mem;\";\r\n    \t\tsqloutput += loadtamemsql;\r\n    \t\tsqloutput += loadtadocmemsql;\r\n    \t\tvar createindex = \"CREATE FULLTEXT INDEX \" + tadoctablename +  \"_idx2 ON \" + schemaname + tadoctablename + \"_mem;\";\r\n    \t\tsqloutput += createindex;\r\n    \t\tvar dummyquery = \"SELECT * FROM  \" + schemaname + tadoctablename + \"_mem WHERE FILE_CONTAINS(filename,'dummy');\";\r\n    \t\tsqloutput += dummyquery;\r\n        }\r\n    }\r\n    $.output(sqloutput);\r\n    if (root)\r\n    {\r\n        root = false;\r\n    }\r\n}\r\n\r\nfunction onIn2 (ctx,s)\r\n{\r\n\tvar inputarr = s.split(\"\\n\");\r\n\tvar ta_csv;\r\n\tvar tadoc_csv;\r\n\tvar i;\r\n\tif (inputarr[0] == \"init\")\r\n\t{\r\n\t    var dbinfo = inputarr[1].split(\",\");\r\n\t\tschemaname = dbinfo[0];\r\n\t\ttablenamesuffix = dbinfo[1];\r\n\t\ttatablename = \"TA_\" + tablenamesuffix;\r\n\t\ttadoctablename = \"TADOC_\" + tablenamesuffix;\r\n\t\tfolders = inputarr[2].split(\",\");\r\n\t\t\r\n\t\tfor (i=0;i<folders.length; i++)\r\n\t\t{\r\n\t\t\tta_csv = getcsvfilename(folders[i]) + \"_TA.csv\";\r\n\t\t\ttadoc_csv = getcsvfilename(folders[i]) + \"_TADOC.csv\";\r\n\t\t\tdatasources[ta_csv] = ds_counter++;\r\n\t\t\tdatasources[tadoc_csv] = ds_counter++;\r\n\t\t}\r\n\t}\r\n\telse if (inputarr[0] == \"update\")\r\n\t{\r\n\t    var newfolders = inputarr[1].split(\",\");\r\n\t    for (i=0;i<newfolders.length;i++)\r\n\t    {\r\n\t        folders.push(newfolders[i]);\r\n\t        ta_csv = getcsvfilename(newfolders[i]) + \"_TA.csv\";\r\n\t\t\ttadoc_csv = getcsvfilename(newfolders[i]) + \"_TADOC.csv\";\r\n\t\t\tdatasources[ta_csv] = ds_counter++;\r\n\t\t\tdatasources[tadoc_csv] = ds_counter++;\r\n\t    }\r\n\t}\r\n\telse if (inputarr[0] == \"delete\")\r\n\t{\r\n\t\tfolders = inputarr[1].split(\",\");\r\n\t\tvar deletedfolders = inputarr;\r\n\t\tvar droptads_sql = \"ALTER TABLE \" + schemaname + tatablename + \" DROP DATASOURCE \";\r\n\t\tvar droptadocds_sql = \"ALTER TABLE \" + schemaname + tadoctablename + \" DROP DATASOURCE \";\r\n\t\tvar sqloutput = \"\";\r\n\t\tfor (i=2;i<deletedfolders.length-1;i++)\r\n\t\t{\r\n\t\t\tta_csv = getcsvfilename(deletedfolders[i]) + \"_TA.csv\";\r\n\t\t\ttadoc_csv = getcsvfilename(deletedfolders[i]) + \"_TADOC.csv\";\r\n\t\t\tsqloutput += droptads_sql + \"ds\" + datasources[ta_csv] + \";\";\r\n\t\t\tsqloutput += droptadocds_sql + \"ds\" + datasources[tadoc_csv] + \";\";\r\n\t\t\tdelete datasources[ta_csv];\r\n\t\t\tdelete datasources[tadoc_csv];\r\n\t\t}\r\n\t\t\r\n\t    var droptadsmem_sql = \"ALTER TABLE \" + schemaname + tatablename + \"_mem DROP DATASOURCE ALL;\";\r\n\t\tdroptadsmem_sql += \"ALTER TABLE \" + schemaname + tadoctablename + \"_mem DROP DATASOURCE ALL;\";\r\n\t\tsqloutput += droptadsmem_sql;\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tatablename + \"_mem;\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tadoctablename + \"_mem;\";\r\n\t\tvar altertablesql = \"\";\r\n\t\tvar j;\r\n\t    for (j=0;j<folders.length;j++)\r\n    \t{\r\n\t    altertablesql += \"ALTER TABLE \" + schemaname + tatablename + \"_mem ADD DATASOURCE hdfs('\" + getcsvfilename(folders[j]) + \"_TA.csv') DELIMITED BY ',' skip 1;\";\r\n\t    altertablesql += \"ALTER TABLE \" + schemaname + tadoctablename + \"_mem ADD DATASOURCE hdfs('\" + getcsvfilename(folders[j]) + \"_TADOC.csv') DELIMITED BY ',' skip 1;\";\r\n    \t}\r\n    \tsqloutput += altertablesql;\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tatablename + \";\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tadoctablename + \";\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tatablename + \"_mem;\";\r\n\t\tsqloutput += \"LOAD TABLE \" + schemaname + tadoctablename + \"_mem;\";\r\n\t\t$.output(sqloutput);\r\n\t}\r\n}\r\n\r\nfunction getcsvfilename (folderpath)\r\n{\r\n\tvar foldername = folderpath.slice(folderpath.lastIndexOf(\"/\"), folderpath.length);\r\n\treturn folderpath + foldername; \r\n}\r\n\r\nfunction getsubfolderscsv (folderpath)\r\n{\r\n\tvar i;\r\n\tvar output = [];\r\n\tfor (i=0;i<folders.length;i++)\r\n\t{\r\n\t\tif (folders[i].indexOf(folderpath) !== -1)\r\n\t\t{\r\n\t\t\toutput.push(getcsvfilename(folders[i]));\r\n\t\t}\r\n\t}\r\n\treturn output;\r\n}",
+                    "createindex": false
+                },
+                "additionalinports": [
+                    {
+                        "name": "input2",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "recursive": true,
+                    "onlyReadOnChange": true,
+                    "path": "/DAT263/reviews/",
+                    "service": "webhdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    }
+                }
+            }
+        },
+        "readfile2": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 17,
+                "y": 132,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "webhdfs",
+                    "path": "/DAT263/reviews/",
+                    "recursive": true,
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "127.0.0.1",
+                            "port": "9000",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "HDFS"
+                    },
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "localhost",
+                            "port": "50070",
+                            "protocol": "webhdfs",
+                            "rootPath": "",
+                            "user": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "WEBHDFS"
+                    }
+                }
+            }
+        },
+        "tostringconverter1": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 201.99999904632568,
+                "y": 42,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "tostringconverter2": {
+            "component": "com.sap.util.toStringConverter",
+            "metadata": {
+                "label": "ToString Converter",
+                "x": 201.99999904632568,
+                "y": 152,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "sapvoraclient1": {
+            "component": "com.sap.vora.client2",
+            "metadata": {
+                "label": "SAP Vora Client",
+                "x": 670.999997138977,
+                "y": 57.50000023841858,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "vora-tx-coordinator",
+                            "password": "Voravora23!",
+                            "port": 10002,
+                            "tenant": "default",
+                            "user": "vora",
+                            "useTLS": false
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "VORA"
+                    }
+                }
+            }
+        },
+        "sapvoraclient2": {
+            "component": "com.sap.vora.client2",
+            "metadata": {
+                "label": "SAP Vora Client",
+                "x": 1748.9999933242798,
+                "y": 72,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "connection": {
+                        "connectionProperties": {
+                            "host": "vora-tx-coordinator",
+                            "password": "Voravora23!",
+                            "port": 10002,
+                            "tenant": "sap",
+                            "user": "vora",
+                            "useTLS": false
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "VORA"
+                    }
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "979.9999961853027,97.50000023841858 1019.9999961853027,97.50000023841858"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator2"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator4"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1518.999994277954,97.50000023841858 1546.999993801117,97.50000023841858 1546.999993801117,103 1574.9999933242798,103"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator3"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator6"
+            }
+        },
+        {
+            "metadata": {
+                "points": "440.99999809265137,103 468.9999976158142,103 468.9999976158142,97.50000023841858 496.99999713897705,97.50000023841858"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator5"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "440.99999809265137,121 468.9999976158142,121 468.9999976158142,165.49999976158142 1546.999993801117,165.49999976158142 1546.999993801117,121 1574.9999933242798,121"
+            },
+            "src": {
+                "port": "output2",
+                "process": "javascriptoperator5"
+            },
+            "tgt": {
+                "port": "input2",
+                "process": "javascriptoperator6"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1148.9999961853027,97.50000023841858 1176.9999957084656,97.50000023841858 1176.9999957084656,106.50000023841858 1204.9999952316284,106.50000023841858"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator4"
+            },
+            "tgt": {
+                "port": "inFolderPath",
+                "process": "experimentaltextanalysistaconnector1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1333.9999952316284,106.50000023841858 1361.9999947547913,106.50000023841858 1361.9999947547913,97.50000023841858 1389.999994277954,97.50000023841858"
+            },
+            "src": {
+                "port": "outFolderPath",
+                "process": "experimentaltextanalysistaconnector1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,43 168.99999952316284,43 168.99999952316284,58 196.99999904632568,58"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "141,163 169,163 169,168 196.99999904632568,168"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "readfile2"
+            },
+            "tgt": {
+                "port": "ininterface",
+                "process": "tostringconverter2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "255.99999904632568,67 283.9999985694885,67 283.9999985694885,103 311.99999809265137,103"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "javascriptoperator5"
+            }
+        },
+        {
+            "metadata": {
+                "points": "255.99999904632568,177 284,177 284,121 311.99999809265137,121"
+            },
+            "src": {
+                "port": "outstring",
+                "process": "tostringconverter2"
+            },
+            "tgt": {
+                "port": "input2",
+                "process": "javascriptoperator5"
+            }
+        },
+        {
+            "metadata": {
+                "points": "625.999997138977,97.50000023841858 665.999997138977,97.50000023841858"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator1"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "sapvoraclient1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "794.999997138977,97.50000023841858 822.9999966621399,97.50000023841858 822.9999966621399,106.50000023841858 850.9999961853027,106.50000023841858"
+            },
+            "src": {
+                "port": "result",
+                "process": "sapvoraclient1"
+            },
+            "tgt": {
+                "port": "input2",
+                "process": "javascriptoperator2"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1703.9999933242798,112 1743.9999933242798,112"
+            },
+            "src": {
+                "port": "output",
+                "process": "javascriptoperator6"
+            },
+            "tgt": {
+                "port": "sql",
+                "process": "sapvoraclient2"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

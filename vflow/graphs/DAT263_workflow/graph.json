@@ -1,0 +1,634 @@
+{
+    "properties": {},
+    "description": "Sentiment by Location Workflow",
+    "processes": {
+        "workflowtrigger1": {
+            "component": "com.sap.dh.trigger",
+            "metadata": {
+                "label": "Workflow Trigger",
+                "x": -58,
+                "y": 70,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "pipeline1": {
+            "component": "com.sap.dh.vflowpipeline",
+            "metadata": {
+                "label": "Text Analysis of Product Review",
+                "x": 254,
+                "y": 146,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "graphName": "DAT263_TA_SentimentAnalysis"
+                }
+            }
+        },
+        "datatransform1": {
+            "component": "com.sap.dh.datatransform",
+            "metadata": {
+                "label": "Merge Review and Cust/Sales Data",
+                "x": 587,
+                "y": 79,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "definition": {
+                        "nodeType": "ContainerNode",
+                        "inputs": [
+                            {
+                                "id": "f4701358-e7c2-4e6e-bd2c-b98972e52d68",
+                                "nodeType": "DataNode",
+                                "name": "Vora_view",
+                                "UILayout": {
+                                    "x": 137,
+                                    "y": 46,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "VORA",
+                                            "type": "VORA"
+                                        },
+                                        "name": "VPRODORDERSBYCUSTLOCATION",
+                                        "remoteObjectType": "VIEW",
+                                        "qualifiedName": "/DAT263/VPRODORDERSBYCUSTLOCATION",
+                                        "nativeQualifiedName": "DAT263.VPRODORDERSBYCUSTLOCATION",
+                                        "version": {}
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "b05d411d-1114-424b-85a0-56cb8dc05163",
+                                        "name": "ORDERAMT",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "d0b41c51-4c6f-428e-8e46-e703c05bb9a5",
+                                        "name": "PRODUCTID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 10
+                                    },
+                                    {
+                                        "id": "68480a60-0a2e-4955-ac18-c45212e3de05",
+                                        "name": "CUSTOMERID",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "dd66f10d-0ee1-44b9-b695-a83c8b5c0fb7",
+                                        "name": "COUNTRY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 100
+                                    },
+                                    {
+                                        "id": "5ddbd488-99ba-4395-a4bf-9ad6fcead763",
+                                        "name": "REGION",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 100
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "45a48a92-fa96-47ab-9e3c-4666084a95fc",
+                                "nodeType": "DataNode",
+                                "name": "TA_output",
+                                "UILayout": {
+                                    "x": 137,
+                                    "y": 149,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "VORA",
+                                            "type": "VORA"
+                                        },
+                                        "name": "VPRODSENTIMENTANALYSIS",
+                                        "remoteObjectType": "VIEW",
+                                        "qualifiedName": "/DAT263/VPRODSENTIMENTANALYSIS",
+                                        "nativeQualifiedName": "DAT263.VPRODSENTIMENTANALYSIS",
+                                        "version": {}
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "627c69c4-64b8-466c-a206-fc183f9a4f48",
+                                        "name": "PRODUCTID",
+                                        "datatype": "STRING",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "f56d47ae-7772-4233-8f2b-9e76051f64b4",
+                                        "name": "SENTIMENT",
+                                        "datatype": "STRING",
+                                        "nullable": false
+                                    },
+                                    {
+                                        "id": "d91a9948-1b51-4c0f-a38a-756e89f4cddc",
+                                        "name": "NUM_OCCURRENCES",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    }
+                                ]
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "id": "0cbbf8a7-f7b5-4187-8ccf-d1a5169c79dc",
+                                "nodeType": "DataNode",
+                                "name": "DataTargetReviewProdIDGPSCust",
+                                "UILayout": {
+                                    "x": 590,
+                                    "y": 100,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "dataset": {
+                                    "database": "",
+                                    "description": "",
+                                    "remoteObjectReference": {
+                                        "connection": {
+                                            "id": "VORA",
+                                            "type": "VORA"
+                                        },
+                                        "name": "SENTIMENTANALYSIS",
+                                        "remoteObjectType": "TABLE.STREAMING",
+                                        "qualifiedName": "/DAT263/SENTIMENTANALYSIS",
+                                        "nativeQualifiedName": "DAT263.SENTIMENTANALYSIS",
+                                        "version": {}
+                                    },
+                                    "schema": {
+                                        "genericType": "TABLE",
+                                        "tableBasedRepresentation": {
+                                            "attributes": []
+                                        }
+                                    }
+                                },
+                                "attributes": [
+                                    {
+                                        "id": "d3e0d5ff-d275-4eac-84a7-1f20e8df7315",
+                                        "name": "PRODUCTID",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 10
+                                    },
+                                    {
+                                        "id": "8eaa0248-530d-4584-a79b-e3014b97fc9c",
+                                        "name": "COUNTRY",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 100
+                                    },
+                                    {
+                                        "id": "498e7b75-c9b5-4d5f-b895-ee6d00f58ed3",
+                                        "name": "REGION",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 100
+                                    },
+                                    {
+                                        "id": "a1ba61fe-0ca2-41ac-bf41-880e8c5f5b4c",
+                                        "name": "SENTIMENT",
+                                        "datatype": "STRING",
+                                        "nullable": false,
+                                        "length": 1000
+                                    },
+                                    {
+                                        "id": "77b13755-61a6-41ed-b1a5-3ad910b73d72",
+                                        "name": "NUM_OCCURENCES",
+                                        "datatype": "INTEGER",
+                                        "nullable": false
+                                    }
+                                ],
+                                "mode": "OVERWRITE"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "id": "1382afec-200c-4271-bf60-3268c8ed6455",
+                                "type": "JoinNode",
+                                "nodeType": "JoinNode",
+                                "name": "JoinOnProductID",
+                                "UILayout": {
+                                    "x": 377,
+                                    "y": 100,
+                                    "height": 80,
+                                    "width": 120
+                                },
+                                "inputs": [
+                                    {
+                                        "id": "4cb80795-f738-493b-879d-8965f0a2af82",
+                                        "name": "Join1_Input1",
+                                        "attributes": [
+                                            {
+                                                "id": "e376ed31-e9d7-40b1-a94d-dc7a683440f0",
+                                                "name": "ORDERAMT",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "a593b23c-2aa6-442e-95f1-6c71b7770694",
+                                                "name": "PRODUCTID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 10
+                                            },
+                                            {
+                                                "id": "9e9f2521-7fdf-4430-b374-0223f863c2d8",
+                                                "name": "CUSTOMERID",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "a990b04d-09ae-41f6-8199-acf116c32868",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 100
+                                            },
+                                            {
+                                                "id": "a48622a1-5537-4040-bb7e-0c5f0e2868ff",
+                                                "name": "REGION",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 100
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": "9aea3215-f228-4b4c-96ce-8cd92d80fbb0",
+                                        "name": "Join1_Input2",
+                                        "attributes": [
+                                            {
+                                                "id": "c87ffed9-0dbc-4890-bff8-5569ae006589",
+                                                "name": "PRODUCTID",
+                                                "datatype": "STRING",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "ab99f180-d102-483d-9dc7-8f0f1bfe1ba1",
+                                                "name": "SENTIMENT",
+                                                "datatype": "STRING",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "b1e768d9-cdf9-48f0-a644-8f28c51accd3",
+                                                "name": "NUM_OCCURRENCES",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "outputs": [
+                                    {
+                                        "id": "d442e0d4-9901-451c-88bc-ae7d0943b4b5",
+                                        "name": "Join1_Output1",
+                                        "attributes": [
+                                            {
+                                                "id": "ec667bbe-12ed-493b-8fdc-6714c67bc7ae",
+                                                "name": "PRODUCTID",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 10
+                                            },
+                                            {
+                                                "id": "013b87d0-35af-490c-8004-a46ae2f412f4",
+                                                "name": "SENTIMENT",
+                                                "datatype": "STRING",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "09b674e4-1b9e-4863-8481-7ae70943275b",
+                                                "name": "NUM_OCCURRENCES",
+                                                "datatype": "INTEGER",
+                                                "nullable": false
+                                            },
+                                            {
+                                                "id": "a2ffae33-cb6e-4c0e-b4cd-58953ddfff6a",
+                                                "name": "COUNTRY",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 100
+                                            },
+                                            {
+                                                "id": "13593230-d8fa-4b2d-b60c-ae456b5479bd",
+                                                "name": "REGION",
+                                                "datatype": "STRING",
+                                                "nullable": false,
+                                                "length": 100
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "joinDefinitions": [
+                                    {
+                                        "left": "4cb80795-f738-493b-879d-8965f0a2af82",
+                                        "right": "9aea3215-f228-4b4c-96ce-8cd92d80fbb0",
+                                        "type": "INNER",
+                                        "condition": "\"Join1_Input1\".\"PRODUCTID\" = \"Join1_Input2\".\"PRODUCTID\""
+                                    }
+                                ],
+                                "tableMappings": [
+                                    {
+                                        "source": "4cb80795-f738-493b-879d-8965f0a2af82",
+                                        "target": "d442e0d4-9901-451c-88bc-ae7d0943b4b5",
+                                        "attributeMappings": [
+                                            {
+                                                "source": "a593b23c-2aa6-442e-95f1-6c71b7770694",
+                                                "target": "ec667bbe-12ed-493b-8fdc-6714c67bc7ae"
+                                            },
+                                            {
+                                                "source": "a990b04d-09ae-41f6-8199-acf116c32868",
+                                                "target": "a2ffae33-cb6e-4c0e-b4cd-58953ddfff6a"
+                                            },
+                                            {
+                                                "source": "a48622a1-5537-4040-bb7e-0c5f0e2868ff",
+                                                "target": "13593230-d8fa-4b2d-b60c-ae456b5479bd"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "source": "9aea3215-f228-4b4c-96ce-8cd92d80fbb0",
+                                        "target": "d442e0d4-9901-451c-88bc-ae7d0943b4b5",
+                                        "attributeMappings": [
+                                            {
+                                                "source": "ab99f180-d102-483d-9dc7-8f0f1bfe1ba1",
+                                                "target": "013b87d0-35af-490c-8004-a46ae2f412f4"
+                                            },
+                                            {
+                                                "source": "b1e768d9-cdf9-48f0-a644-8f28c51accd3",
+                                                "target": "09b674e4-1b9e-4863-8481-7ae70943275b"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "tableMappings": [
+                            {
+                                "source": "f4701358-e7c2-4e6e-bd2c-b98972e52d68",
+                                "target": "4cb80795-f738-493b-879d-8965f0a2af82",
+                                "UILayout": {
+                                    "points": "257,86 317,86 317,131 377,131"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "b05d411d-1114-424b-85a0-56cb8dc05163",
+                                        "target": "e376ed31-e9d7-40b1-a94d-dc7a683440f0"
+                                    },
+                                    {
+                                        "source": "d0b41c51-4c6f-428e-8e46-e703c05bb9a5",
+                                        "target": "a593b23c-2aa6-442e-95f1-6c71b7770694"
+                                    },
+                                    {
+                                        "source": "68480a60-0a2e-4955-ac18-c45212e3de05",
+                                        "target": "9e9f2521-7fdf-4430-b374-0223f863c2d8"
+                                    },
+                                    {
+                                        "source": "dd66f10d-0ee1-44b9-b695-a83c8b5c0fb7",
+                                        "target": "a990b04d-09ae-41f6-8199-acf116c32868"
+                                    },
+                                    {
+                                        "source": "5ddbd488-99ba-4395-a4bf-9ad6fcead763",
+                                        "target": "a48622a1-5537-4040-bb7e-0c5f0e2868ff"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "45a48a92-fa96-47ab-9e3c-4666084a95fc",
+                                "target": "9aea3215-f228-4b4c-96ce-8cd92d80fbb0",
+                                "UILayout": {
+                                    "points": "257,189 317,189 317,149 377,149"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "627c69c4-64b8-466c-a206-fc183f9a4f48",
+                                        "target": "c87ffed9-0dbc-4890-bff8-5569ae006589"
+                                    },
+                                    {
+                                        "source": "f56d47ae-7772-4233-8f2b-9e76051f64b4",
+                                        "target": "ab99f180-d102-483d-9dc7-8f0f1bfe1ba1"
+                                    },
+                                    {
+                                        "source": "d91a9948-1b51-4c0f-a38a-756e89f4cddc",
+                                        "target": "b1e768d9-cdf9-48f0-a644-8f28c51accd3"
+                                    }
+                                ]
+                            },
+                            {
+                                "source": "d442e0d4-9901-451c-88bc-ae7d0943b4b5",
+                                "target": "0cbbf8a7-f7b5-4187-8ccf-d1a5169c79dc",
+                                "UILayout": {
+                                    "points": "497,140 590,140"
+                                },
+                                "attributeMappings": [
+                                    {
+                                        "source": "ec667bbe-12ed-493b-8fdc-6714c67bc7ae",
+                                        "target": "d3e0d5ff-d275-4eac-84a7-1f20e8df7315"
+                                    },
+                                    {
+                                        "source": "013b87d0-35af-490c-8004-a46ae2f412f4",
+                                        "target": "a1ba61fe-0ca2-41ac-bf41-880e8c5f5b4c"
+                                    },
+                                    {
+                                        "source": "a2ffae33-cb6e-4c0e-b4cd-58953ddfff6a",
+                                        "target": "8eaa0248-530d-4584-a79b-e3014b97fc9c"
+                                    },
+                                    {
+                                        "source": "13593230-d8fa-4b2d-b60c-ae456b5479bd",
+                                        "target": "498e7b75-c9b5-4d5f-b895-ee6d00f58ed3"
+                                    },
+                                    {
+                                        "source": "09b674e4-1b9e-4863-8481-7ae70943275b",
+                                        "target": "77b13755-61a6-41ed-b1a5-3ad910b73d72"
+                                    }
+                                ]
+                            }
+                        ],
+                        "invalidMappings": []
+                    }
+                }
+            }
+        },
+        "workflowterminator1": {
+            "component": "com.sap.dh.terminator",
+            "metadata": {
+                "label": "Workflow Terminator",
+                "x": 746,
+                "y": 79,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "sapbwprocesschain1": {
+            "component": "com.sap.dh.bwprocesschain",
+            "metadata": {
+                "label": "BW - Gather Cust/Sales Data",
+                "x": 249,
+                "y": 25,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "bwConnection": {
+                        "configurationType": "Configuration Manager",
+                        "connectionId": "BW",
+                        "connectionProperties": {}
+                    },
+                    "id": "ZWAIT_10_SECONDS"
+                }
+            }
+        },
+        "workflowsplit1": {
+            "component": "com.sap.dh.split",
+            "metadata": {
+                "label": "Workflow Split",
+                "x": 91,
+                "y": 79,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "workflowmergeand1": {
+            "component": "com.sap.dh.logical.AND",
+            "metadata": {
+                "label": "Workflow Merge (AND)",
+                "x": 416,
+                "y": 79,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "711,110 726,110 726,119 741,119"
+            },
+            "src": {
+                "port": "output",
+                "process": "datatransform1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "workflowterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "66,110 76,110 76,119 86,119"
+            },
+            "src": {
+                "port": "output",
+                "process": "workflowtrigger1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "workflowsplit1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "215,110 229.5,110 229.5,65 244,65"
+            },
+            "src": {
+                "port": "out1",
+                "process": "workflowsplit1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "sapbwprocesschain1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "215,128 232,128 232,186 249,186"
+            },
+            "src": {
+                "port": "out2",
+                "process": "workflowsplit1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "pipeline1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "373,56 392,56 392,110 411,110"
+            },
+            "src": {
+                "port": "output",
+                "process": "sapbwprocesschain1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "workflowmergeand1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "378,177 394.5,177 394.5,128 411,128"
+            },
+            "src": {
+                "port": "output",
+                "process": "pipeline1"
+            },
+            "tgt": {
+                "port": "input2",
+                "process": "workflowmergeand1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "540,119 582,119"
+            },
+            "src": {
+                "port": "output",
+                "process": "workflowmergeand1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "datatransform1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

@@ -1,0 +1,188 @@
+{
+    "properties": {},
+    "iconsrc": "../Brain.png",
+    "description": "Dataset Creation for Face Match Demo",
+    "processes": {
+        "python2operator1": {
+            "component": "com.sap.system.python2Operator",
+            "metadata": {
+                "label": "Face Recognizer",
+                "x": 921,
+                "y": 185,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import numpy as np\nfrom pysix_subengine.message import Message\nimport dlib\nimport pickle\nimport os\nimport json\n\nvalues = dict()\nsp = None\nfacerec = None\n\ndef initialize():\n    global sp, facerec\n    predictor_path = \"/vrep/vflow/blobs/com/sap/ml/faceRecognition/models/shape_predictor_5_face_landmarks.dat\"\n    sp = dlib.shape_predictor(predictor_path)\n    face_rec_model_path = \"/vrep/vflow/blobs/com/sap/ml/faceRecognition/models/dlib_face_recognition_resnet_model_v1.dat\"\n    facerec = dlib.face_recognition_model_v1(face_rec_model_path)\n\ndef generate_feature_vectors(msg_image, msg_rects):\n    img = msg_image.body\n    rects = msg_rects.body\n    for (x,y,w,h) in rects:\n        d = dlib.rectangle(x,y,x+w,y+h)\n        shape = sp(img, d)\n        face_descriptor = facerec.compute_face_descriptor(img, shape)\n        add_to_data(face_descriptor, os.path.basename(os.path.dirname(msg_image.attributes['path'])), msg_image.attributes)\n    \ndef add_to_data(data, name, msg_attributes):\n    array = []\n    for num in data:\n        array.append(num)\n    name = name.replace('_', ' ')\n    value = dict()\n    value[\"name\"] = name\n    value[\"vectors\"] = [array]\n    values[name] = value\n    api.logger.info(\"Processing data :\" + name)\n    if (not msg_attributes is None and \\\n        'last' in msg_attributes and \\\n        msg_attributes['last']):\n            messageOut = Message(body=values, attributes=msg_attributes)\n            api.send(\"dictOut\", messageOut)\n\napi.add_generator(initialize)\napi.set_port_callback([\"imageIn\", \"rectsIn\"], generate_feature_vectors)"
+                },
+                "additionalinports": [
+                    {
+                        "name": "imageIn",
+                        "type": "message.python.image"
+                    },
+                    {
+                        "name": "rectsIn",
+                        "type": "message.python.image.rectangles"
+                    }
+                ],
+                "additionaloutports": [
+                    {
+                        "name": "dictOut",
+                        "type": "message.python.dict"
+                    }
+                ]
+            }
+        },
+        "readfiles1": {
+            "component": "experimental.core.io.readFiles",
+            "metadata": {
+                "label": "Read Files",
+                "x": 263,
+                "y": 185,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "sourcePath": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/IXP",
+                    "depth": 1
+                }
+            }
+        },
+        "savepickle1": {
+            "component": "experimental.core.io.savePickle",
+            "metadata": {
+                "label": "Save Pickle",
+                "x": 1096,
+                "y": 185,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "filePath": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/pickle/data.pickle",
+                    "waitLast": true
+                }
+            }
+        },
+        "facedetectionopencv1": {
+            "component": "experimental.ml.imageprocessing.detection.opencv.faceDetection",
+            "metadata": {
+                "label": "Face Detection opencv",
+                "x": 701,
+                "y": 185,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "face_cascade_path": "/vrep/vflow/blobs/com/sap/ml/faceRecognition/models/lbpcascade_frontalface.xml",
+                    "script": "import cv2\r\n\r\nfrontal_face_cascade = cv2.CascadeClassifier(api.config.face_cascade_path)\r\n#side_face_cascade = cv2.CascadeClassifier('../../../../blobs/com/sap/ml/faceRecognition/models/lbpcascade_profileface.xml')\r\n\r\ndef detect_frontal_face(img):\r\n    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\r\n    faces = frontal_face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);\r\n    return faces\r\n    \r\ndef detect_side_face(img):\r\n    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\r\n    #faces = side_face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);\r\n    faces = []\r\n    return faces\r\n\r\ndef get_rects(test_img):\r\n    img = test_img.copy()\r\n    frontal_rects = detect_frontal_face(img)\r\n    side_rects  = detect_side_face(img)\r\n    rectangles = []\r\n    for (x, y, w, h) in frontal_rects:\r\n        rectangles.append([x,y,w,h])\r\n    for (x, y, w, h) in side_rects:\r\n        rectangles.append([x,y,w,h])\r\n    return rectangles\r\n    \r\ndef on_input(message):\r\n    message.attributes[\"skip_frame\"] = int(api.config.skip_frames)\r\n    msg_rects = api.Message(\"\")\r\n    rects = get_rects(message.body)\r\n    msg_rects.body = rects\r\n    api.send(\"rectsOut\", msg_rects)\r\n    api.send(\"imageOut\", message)\r\n\r\napi.set_port_callback(\"imageIn\", on_input)"
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1271,
+                "y": 185,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "pathtoimages1": {
+            "component": "experimental.ml.imageprocessing.mediaio.pathToImages",
+            "metadata": {
+                "label": "Path to Images",
+                "x": 491,
+                "y": 185,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "825,234 871,234 871,216 917,216"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "facedetectionopencv1"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "python2operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "825,216 871,216 871,234 917,234"
+            },
+            "src": {
+                "port": "rectsOut",
+                "process": "facedetectionopencv1"
+            },
+            "tgt": {
+                "port": "rectsIn",
+                "process": "python2operator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1220,225 1267,225"
+            },
+            "src": {
+                "port": "pathOut",
+                "process": "savepickle1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1045,225 1092,225"
+            },
+            "src": {
+                "port": "dictOut",
+                "process": "python2operator1"
+            },
+            "tgt": {
+                "port": "dictIn",
+                "process": "savepickle1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "387,225 487,225"
+            },
+            "src": {
+                "port": "pathOut",
+                "process": "readfiles1"
+            },
+            "tgt": {
+                "port": "pathImageIn",
+                "process": "pathtoimages1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "615,225 697,225"
+            },
+            "src": {
+                "port": "imageOut",
+                "process": "pathtoimages1"
+            },
+            "tgt": {
+                "port": "imageIn",
+                "process": "facedetectionopencv1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

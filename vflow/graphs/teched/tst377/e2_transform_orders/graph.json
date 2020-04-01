@@ -1,0 +1,264 @@
+{
+    "properties": {},
+    "description": "[SOL377] Export Orders",
+    "processes": {
+        "readfile1": {
+            "component": "com.sap.storage.read",
+            "metadata": {
+                "label": "Read File",
+                "x": 350,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "terminateOnError": true,
+                    "recursive": true,
+                    "path": "",
+                    "onlyReadOnChange": true,
+                    "service": "S3",
+                    "awsBucket": "bucket1",
+                    "awsConnection": {
+                        "connectionProperties": {
+                            "accessKey": "AWSAccessKeyId",
+                            "awsProxy": "",
+                            "endpoint": "",
+                            "protocol": "HTTPS",
+                            "region": "eu-central-1",
+                            "rootPath": "",
+                            "secretKey": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "S3"
+                    }
+                }
+            }
+        },
+        "messagefilter1": {
+            "component": "com.sap.datatools.message_filter",
+            "metadata": {
+                "label": "Message Filter",
+                "x": 763.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "condition": {
+                        "daterange.last": true,
+                        "storage.endOfSequence": true
+                    }
+                }
+            }
+        },
+        "datetimerange1": {
+            "component": "com.sap.datatools.daterange",
+            "metadata": {
+                "label": "Datetime Range",
+                "x": 168,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "extensible": false,
+                "config": {
+                    "outstring": "/DAT377/${USER}/inbox/<DATE>/",
+                    "rangeconfig": {
+                        "date_from": "2019-01-01",
+                        "date_to": "2019-01-05",
+                        "delta": "1d"
+                    }
+                }
+            }
+        },
+        "wiretap1": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 931.9999990463257,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "wiretap3": {
+            "component": "com.sap.util.wiretap",
+            "metadata": {
+                "label": "Wiretap",
+                "x": 568,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "ui": "dynpath",
+                "config": {}
+            }
+        },
+        "pandastransform1": {
+            "component": "com.sap.datatools.pandas_transform",
+            "metadata": {
+                "label": "Pandas Transform",
+                "x": 456,
+                "y": -109,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "script": "import pandas as pd\n\ndef on_dataframe(df, ctx):\n    # do something\n    df = df[[\"uid\", \"pid\", \"amount\"]]\n    ctx.send(df, {})\n\n\n# //////////////////////////////////////////////////////////\n\ndef get_prop(name, default_value):\n    if hasattr(api.config, name):\n        return getattr(api.config, name)\n    return default_value\n\nin_format = get_prop(\"in_format\", \"CSV\")\nout_format = get_prop(\"out_format\", \"CSV\")\nin_properties = get_prop(\"in_properties\", { \"header\": -1 })\nout_properties = get_prop(\"out_properties\", {})\n\nfrom operators.com.sap.datatools.util.pdutil import OpContext\nctx = OpContext(api,\n        on_dataframe,\n        \"output\",\n        in_format=in_format,\n        out_format=out_format,\n        in_properties=in_properties,\n        out_properties=out_properties)\n\ndef on_input(msg):\n    ctx.process(msg)\n\napi.set_port_callback(\"input\", on_input)\n\n",
+                    "out_format": "JSON",
+                    "in_properties": {
+                        "header": -1,
+                        "names": [
+                            "oid",
+                            "dt",
+                            "uid",
+                            "email",
+                            "pid",
+                            "amount",
+                            "curr",
+                            "price"
+                        ]
+                    },
+                    "out_properties": {
+                        "orient": "values"
+                    }
+                }
+            }
+        },
+        "writefile1": {
+            "component": "com.sap.storage.write",
+            "metadata": {
+                "label": "Write File",
+                "x": 673,
+                "y": -109,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "mode": "overwrite",
+                    "path": "/DAT377/${USER}/export/recs-\\${daterange.value}.json",
+                    "service": "S3",
+                    "awsConnection": {
+                        "connectionProperties": {
+                            "accessKey": "AWSAccessKeyId",
+                            "awsProxy": "",
+                            "endpoint": "",
+                            "protocol": "HTTPS",
+                            "region": "eu-central-1",
+                            "rootPath": "",
+                            "secretKey": ""
+                        },
+                        "configurationType": "Configuration Manager",
+                        "connectionID": "S3"
+                    },
+                    "awsBucket": "bucket1"
+                }
+            }
+        },
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1086,
+                "y": 12,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "887.9999990463257,52 926.9999990463257,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "messagefilter1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "292,52 345,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "datetimerange1"
+            },
+            "tgt": {
+                "port": "inPath",
+                "process": "readfile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "1055.9999990463257,52 1081,52"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "474,61 524,61 524,-4 401,-4 401,-69 451,-69"
+            },
+            "src": {
+                "port": "outFile",
+                "process": "readfile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "pandastransform1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "580,-69 580,-67 622,-67 622,-8.5 531,-8.5 531,52 563,52"
+            },
+            "src": {
+                "port": "output",
+                "process": "pandastransform1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "wiretap3"
+            }
+        },
+        {
+            "metadata": {
+                "points": "692,52 721,52 721,-8.5 632,-8.5 632,-69 668,-69"
+            },
+            "src": {
+                "port": "out",
+                "process": "wiretap3"
+            },
+            "tgt": {
+                "port": "inFile",
+                "process": "writefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "797,-69 847,-69 847,-8.5 734,-8.5 734,52 758.9999990463257,52"
+            },
+            "src": {
+                "port": "outFilename",
+                "process": "writefile1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "messagefilter1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

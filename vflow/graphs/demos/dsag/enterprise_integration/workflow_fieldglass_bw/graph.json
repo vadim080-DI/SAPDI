@@ -1,0 +1,653 @@
+{
+    "properties": {},
+    "description": "Workflow Fieldglass Vora BW",
+    "processes": {
+        "workflowtrigger1": {
+            "component": "com.sap.dh.trigger",
+            "metadata": {
+                "label": "Workflow Trigger",
+                "x": 162,
+                "y": 272,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {}
+            }
+        },
+        "pipeline1": {
+            "component": "com.sap.dh.vflowpipeline",
+            "metadata": {
+                "label": "Load Time Sheets",
+                "x": 355,
+                "y": 272,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "graphName": "demos.dsag.enterprise_integration.fieldglass_vora_time_sheets",
+                    "isPermanentlyRunning": "true"
+                }
+            }
+        },
+        "sapbwprocesschain1": {
+            "component": "com.sap.dh.bwprocesschain",
+            "metadata": {
+                "label": "SAP BW Process Chain",
+                "x": 569,
+                "y": 272,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "bwConnection": {
+                        "configurationType": "Configuration Manager",
+                        "connectionId": "BW",
+                        "connectionProperties": {}
+                    },
+                    "id": "VORA_FG_TIMESHEET"
+                }
+            }
+        },
+        "datatransfer1": {
+            "component": "com.sap.dh.bwdatatransfer",
+            "metadata": {
+                "label": "Data Transfer",
+                "x": 779,
+                "y": 272,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "source": {
+                        "remoteObjectReference": {
+                            "connection": {
+                                "id": "BW",
+                                "type": "BW"
+                            },
+                            "qualifiedName": "/QUERY/TIMESHEET_Q1",
+                            "remoteObjectType": "QUERY",
+                            "name": "/QUERY/TIMESHEET_Q1"
+                        },
+                        "schema": {
+                            "dataTypeRef": null,
+                            "genericType": "TABLE",
+                            "tableBasedRepresentation": {
+                                "attributes": [
+                                    {
+                                        "name": "4TIMESHEET-SUPPLIER_CODE",
+                                        "originalName": "4TIMESHEET-SUPPLIER_CODE",
+                                        "qualifiedName": "4TIMESHEET-SUPPLIER_CODE",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "SUPPLIER_CODE",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "4TIMESHEET-SUPPLIER_NAME",
+                                        "originalName": "4TIMESHEET-SUPPLIER_NAME",
+                                        "qualifiedName": "4TIMESHEET-SUPPLIER_NAME",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "SUPPLIER_NAME",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "4TIMESHEET-BUYER_CODE",
+                                        "originalName": "4TIMESHEET-BUYER_CODE",
+                                        "qualifiedName": "4TIMESHEET-BUYER_CODE",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "BUYER_CODE",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "4TIMESHEET-BUYER_NAME",
+                                        "originalName": "4TIMESHEET-BUYER_NAME",
+                                        "qualifiedName": "4TIMESHEET-BUYER_NAME",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "BUYER_NAME",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILLABLE_AMOUNT",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKMNHE",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKMNHE",
+                                        "datatype": "DECIMAL",
+                                        "precision": 255,
+                                        "scale": 2,
+                                        "nativeDatatype": "Amount",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILLABLE_AMOUNT",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILLABLE_PER_DIEM",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKO21U",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKO21U",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILLABLE_PER_DIEM",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILLABLE_HOURS",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKO8DE",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKO8DE",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILLABLE_HOURS",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "NON_BILLABLE_HOURS",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKOEOY",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKOEOY",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "NON_BILLABLE_HOURS",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "TOTAL_HOURS",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKOL0I",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKOL0I",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "TOTAL_HOURS",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILL_RATE_BUYER",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKORC2",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKORC2",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILL_RATE_BUYER",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILL_RATE_SUPPLIER",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKOXNM",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKOXNM",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILL_RATE_SUPPLIER",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "PAY_RATE",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKP3Z6",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKP3Z6",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "PAY_RATE",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        "parameterSetting": {
+                            "selectOptions": []
+                        }
+                    },
+                    "target": {
+                        "remoteObjectReference": {
+                            "connection": {
+                                "id": "VORA_EXT",
+                                "type": "VORA",
+                                "hanaWirePort": "30115"
+                            },
+                            "qualifiedName": "/FG/BW_TIMESHEETS_REPORT",
+                            "remoteObjectType": ""
+                        },
+                        "schema": {
+                            "dataTypeRef": null,
+                            "genericType": "TABLE",
+                            "tableBasedRepresentation": {
+                                "attributes": [
+                                    {
+                                        "name": "4TIMESHEET-SUPPLIER_CODE",
+                                        "originalName": "4TIMESHEET-SUPPLIER_CODE",
+                                        "qualifiedName": "4TIMESHEET-SUPPLIER_CODE",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "SUPPLIER_CODE",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "4TIMESHEET-SUPPLIER_NAME",
+                                        "originalName": "4TIMESHEET-SUPPLIER_NAME",
+                                        "qualifiedName": "4TIMESHEET-SUPPLIER_NAME",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "SUPPLIER_NAME",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "4TIMESHEET-BUYER_CODE",
+                                        "originalName": "4TIMESHEET-BUYER_CODE",
+                                        "qualifiedName": "4TIMESHEET-BUYER_CODE",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "BUYER_CODE",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "4TIMESHEET-BUYER_NAME",
+                                        "originalName": "4TIMESHEET-BUYER_NAME",
+                                        "qualifiedName": "4TIMESHEET-BUYER_NAME",
+                                        "datatype": "STRING",
+                                        "length": 255,
+                                        "nativeDatatype": "String",
+                                        "defaultAggregation": "NONE",
+                                        "isMultiValued": true,
+                                        "possibleOperators": [
+                                            "BETWEEN",
+                                            "=",
+                                            ">=",
+                                            ">",
+                                            "<=",
+                                            "<"
+                                        ],
+                                        "descriptions": [
+                                            {
+                                                "value": "BUYER_NAME",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILLABLE_AMOUNT",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKMNHE",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKMNHE",
+                                        "datatype": "DECIMAL",
+                                        "precision": 255,
+                                        "scale": 2,
+                                        "nativeDatatype": "Amount",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILLABLE_AMOUNT",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILLABLE_PER_DIEM",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKO21U",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKO21U",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILLABLE_PER_DIEM",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILLABLE_HOURS",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKO8DE",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKO8DE",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILLABLE_HOURS",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "NON_BILLABLE_HOURS",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKOEOY",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKOEOY",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "NON_BILLABLE_HOURS",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "TOTAL_HOURS",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKOL0I",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKOL0I",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "TOTAL_HOURS",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILL_RATE_BUYER",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKORC2",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKORC2",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILL_RATE_BUYER",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "BILL_RATE_SUPPLIER",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKOXNM",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKOXNM",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "BILL_RATE_SUPPLIER",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "PAY_RATE",
+                                        "originalName": "3WO90GB2XFHPLFGOHZBKKP3Z6",
+                                        "qualifiedName": "3WO90GB2XFHPLFGOHZBKKP3Z6",
+                                        "datatype": "FLOATING",
+                                        "length": 8,
+                                        "nativeDatatype": "Double",
+                                        "defaultAggregation": "FORMULA",
+                                        "isMultiValued": false,
+                                        "descriptions": [
+                                            {
+                                                "value": "PAY_RATE",
+                                                "locale": "en",
+                                                "type": "SHORT"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "timeout": "",
+                    "partitionSpecification": {},
+                    "sourceSpecificConfiguration": {
+                        "bwAccessMethod": "INA"
+                    }
+                }
+            }
+        },
+        "workflowterminator1": {
+            "component": "com.sap.dh.terminator",
+            "metadata": {
+                "label": "Workflow Terminator",
+                "x": 992,
+                "y": 272,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "286,312 350,312"
+            },
+            "src": {
+                "port": "output",
+                "process": "workflowtrigger1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "pipeline1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "479,303 521.5,303 521.5,312 564,312"
+            },
+            "src": {
+                "port": "output",
+                "process": "pipeline1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "sapbwprocesschain1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "693,303 733.5,303 733.5,312 774,312"
+            },
+            "src": {
+                "port": "output",
+                "process": "sapbwprocesschain1"
+            },
+            "tgt": {
+                "port": "input",
+                "process": "datatransfer1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "903,303 945,303 945,312 987,312"
+            },
+            "src": {
+                "port": "output",
+                "process": "datatransfer1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "workflowterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}

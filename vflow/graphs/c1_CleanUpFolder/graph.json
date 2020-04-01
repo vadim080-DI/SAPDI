@@ -1,0 +1,120 @@
+{
+    "properties": {},
+    "description": "c1_CleanUpFolder",
+    "processes": {
+        "graphterminator1": {
+            "component": "com.sap.util.graphTerminator",
+            "metadata": {
+                "label": "Graph Terminator",
+                "x": 1008,
+                "y": 247,
+                "height": 80,
+                "width": 120,
+                "config": {}
+            }
+        },
+        "removefile1": {
+            "component": "com.sap.storage.remove2",
+            "metadata": {
+                "label": "Remove File",
+                "x": 677,
+                "y": 130,
+                "height": 80,
+                "width": 120,
+                "config": {
+                    "service": "hdfs",
+                    "hadoopConnection": {
+                        "connectionProperties": {
+                            "host": "xsahana.sap.com",
+                            "port": 8020,
+                            "user": "hdfs",
+                            "protocol": "rpc"
+                        },
+                        "configurationType": "Manual",
+                        "connectionID": "HDFS"
+                    },
+                    "terminateOnError": false,
+                    "webhdfsConnection": {
+                        "connectionProperties": {
+                            "host": "xsahana.sap.com",
+                            "port": 8020,
+                            "protocol": "rpc",
+                            "rootPath": "",
+                            "user": "hdfs"
+                        },
+                        "configurationType": "Manual"
+                    }
+                }
+            }
+        },
+        "tomessageconverter1": {
+            "component": "com.sap.util.toMessageConverter",
+            "metadata": {
+                "label": "ToMessage Converter",
+                "x": 548,
+                "y": 257,
+                "height": 50,
+                "width": 50,
+                "config": {}
+            }
+        },
+        "constantgenerator1": {
+            "component": "com.sap.util.constantGenerator",
+            "metadata": {
+                "label": "Constant Generator",
+                "x": 354,
+                "y": 278,
+                "height": 80,
+                "width": 120,
+                "extensible": true,
+                "config": {
+                    "content": "/exercises/solutions"
+                }
+            }
+        }
+    },
+    "groups": [],
+    "connections": [
+        {
+            "metadata": {
+                "points": "602,282 637.5,282 637.5,170 673,170"
+            },
+            "src": {
+                "port": "out",
+                "process": "tomessageconverter1"
+            },
+            "tgt": {
+                "port": "in",
+                "process": "removefile1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "478,318 511,318 511,273 544,273"
+            },
+            "src": {
+                "port": "out",
+                "process": "constantgenerator1"
+            },
+            "tgt": {
+                "port": "inbody",
+                "process": "tomessageconverter1"
+            }
+        },
+        {
+            "metadata": {
+                "points": "801,170 902.5,170 902.5,287 1004,287"
+            },
+            "src": {
+                "port": "out",
+                "process": "removefile1"
+            },
+            "tgt": {
+                "port": "stop",
+                "process": "graphterminator1"
+            }
+        }
+    ],
+    "inports": {},
+    "outports": {}
+}
